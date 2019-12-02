@@ -89,15 +89,30 @@ const bool OUT_OF_PLANE_GROWTH = false;
 
 //If the following is set to true, nonlinear growth rates are applied. False
 //is linear.
-const bool NONLINEAR_GROWTH = false;
+const bool NONLINEAR_GROWTH = true;
 
 //If the following is set to false, then boundary division will not occur. This is also true for the L1 layer.
 const bool BOUNDARY_DIVISION = false;
 //All cells with layer >= STEM_LAYER will have stem damping and effects.
 const int STEM_LAYER = 7;
 
+//EXPERIMENTAL PARAMETER - DIV_MECHANISM 
+//1 - Errera's rule
+//2 - Chemically driven division
+//3 - Mechanical Division
+//int DIV_MECHANISM;
+
+
+//EXPERIMENTAL PARAMETER - WUS Radius
+//Contracts radius of template for WUS 
+//double WUS_RAD_CONTRACTION_FACTOR;
+//EXPERIMENTAL PARAMETER - CK Radius
+//Contracts radius of template for CK 
+//double CK_RAD_CONTRACTION_FACTOR;
+
 /////// VTK parameters
 //Tensile stress cytoplasm color (Calibrated from circle value)
 const double CYT_COLOR = 42.0;
 ////=====================
 #endif
+

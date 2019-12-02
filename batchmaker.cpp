@@ -17,6 +17,9 @@ int main(int argc, char* argv[]) {
 	char mins[100] = "";
 	char nodes[100] = "";
 	char mem[100] = "";
+	char DPM[100] = "";
+	char WUS_CF[100]= "";
+	char CK_CF[100] = "";
 	int divDataCutoff;
 
 	for (int i = 1; i < argc; i++) { 
@@ -36,6 +39,12 @@ int main(int argc, char* argv[]) {
 			strcpy(mem, argv[i+1]);
 		} else if (!strcmp(argv[i], "-help")) { 
 			goto helplabel;
+		} else if (!strcmp(argv[i], "-WR")) { 
+			strcpy(WUS_CF, argv[i+1]);
+		} else if (!strcmp(argv[i], "-CKR")) { 
+			strcpy(CK_CF, argv[i+1]);
+		} else if (!strcmp(argv[i], "-div")) { 
+			strcpy(DPM, argv[i+1]);
 		}
 	}
 
@@ -103,7 +112,9 @@ int main(int argc, char* argv[]) {
 	ofs << "mkdir Locations_test_1\n";
 	ofs << "mkdir Animate_No_Cyt_" << test << "\n";
 	ofs << "./program Animate_Cyt_" << test << " Locations_test_" << test << " Nematic_test_" 
-		<< test << " Animate_No_Cyt_" << test << "\n";
+		<< test << " Animate_No_Cyt_" << test << 
+		 " -WR " << WUS_CF << " -CKR " << CK_CF << " -div "
+		<< DPM << "\n";
 	ofs.close();
 
 

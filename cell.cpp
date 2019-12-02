@@ -337,12 +337,13 @@ void Cell::update_Cell_Progress() {
 	return;
 }
 void Cell::calc_WUS(Coord L1_AVG) {
-
+	
 	//new data from eric
 	//CZ ~5 cells wide
 	//layer 1
 	//from 2018 paper
 	double distance = (cell_center-(L1_AVG-Coord(0,21))).length();
+	distance = distance * WUS_RAD_CONTRACTION_FACTOR; 
 	//if(distance < 140*.15){
 	this->wuschel = 84.6*exp(-0.01573*(distance));
 	//}
@@ -353,6 +354,7 @@ void Cell::calc_WUS(Coord L1_AVG) {
 }
 void Cell::calc_CK(Coord L1_AVG) {
 	double distance = (cell_center-(L1_AVG-Coord(0,21))).length();
+	distance = distance * CK_RAD_CONTRACTION_FACTOR;
 	if((this->get_Layer() == 1)||(this->get_Layer() == 2)) {
 		this->cytokinin = 0;
 	} else {
@@ -1245,7 +1247,6 @@ void Cell::delete_Wall_Node_Check(int Ti){
 				repeat = true;
 				this->get_Tissue()->inc_Num_Deleted();
 			}
-
 			if (repeat) break;
 		}
 	} while (repeat);

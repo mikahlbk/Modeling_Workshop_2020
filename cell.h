@@ -19,6 +19,7 @@ class Tissue;
 #include "phys.h"
 #include "coord.h"
 #include "node.h"
+#include "externs.h"
 #include <boost/random.hpp>
 //===================
 // Cell Class Declaration
@@ -50,6 +51,7 @@ class Cell: public enable_shared_from_this<Cell> {
 		vector<shared_ptr<Cell>> adh_neighbors;
 		shared_ptr<Wall_Node> left_Corner;
 		bool recent_div;
+		//0 is interphase, 1 is Mother, 2 is Daughter
 		int recent_div_MD;
 	public:
 

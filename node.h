@@ -15,6 +15,7 @@ class Cyt_Node;
 #include <memory>
 #include "phys.h"
 #include "coord.h"
+#include "externs.h"
 //=====================
 
 class Node{

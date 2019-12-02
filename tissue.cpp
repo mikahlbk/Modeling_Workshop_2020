@@ -307,7 +307,7 @@ void Tissue::add_Wall(int Ti) {
 	return;
 }
 void Tissue::delete_Wall(int Ti) {
- 	// (pragma) pragma omp parallel for schedule(static,1)
+	#pragma omp parallel for schedule(static,1)
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		//cout<< "Wall Count Cell " << i << ": " << cells.at(i)->get_wall_count() << endl;
 		cells.at(i)->delete_Wall_Node_Check(Ti);

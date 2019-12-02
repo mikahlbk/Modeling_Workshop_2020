@@ -18,6 +18,7 @@
 #include "node.h"
 #include "cell.h"
 #include "tissue.h"
+#include "externs.h"
 //==========================
 //find the nodes to set up the division plane
 void Cell::find_nodes_for_div_plane(Coord& orientation, vector<shared_ptr<Wall_Node>>& nodes, int search_amount) {
@@ -507,20 +508,38 @@ shared_ptr<Cell> Cell::division() {
 	//}
 
 	//orientation by chemical concentration
-	if((this->get_CYT_concentration() > this->get_WUS_concentration())){
-		orientation = Coord(1,0);
-	} else { 
-		orientation = Coord(0,1);
-	}
-	//orientation by mechanical stress- various algorithms
 	vector<shared_ptr<Wall_Node>> nodes;
 	cout << "Nodes before " << nodes.size() << endl;
 
-	if(((this->layer == 1)||(this->layer==2)) && L1_L2_FORCED_ANTICLINAL_DIV){
+	bool forced_anticlinal = ((this->layer == 1)||(this->layer==2))
+		&& L1_L2_FORCED_ANTICLINAL_DIV;
+
+	if (forced_anticlinal) { 
 		orientation = Coord(0,1);
 		find_nodes_for_div_plane(orientation,nodes,11);
-	} else {
-		find_nodes_for_div_plane_mechanical(nodes); 
+	} else { 
+		switch (DIV_MECHANISM) { 
+			case 1: 
+				//Errera's rule
+				Errera_div(nodes);
+				break;
+			case 2:
+				//Chemically Driven Division
+				if((this->get_CYT_concentration() > this->get_WUS_concentration())){
+					orientation = Coord(1,0);
+				} else { 
+					orientation = Coord(0,1);
+				}
+				find_nodes_for_div_plane(orientation,nodes,11);
+				break;
+			case 3:
+				//Mechanical Division
+				find_nodes_for_div_plane_mechanical(nodes); 
+				break;
+			default:
+				cout << "DIV_MECH NOT ENTERED. Exiting..." << endl;
+				exit(1);
+		}
 	}
 
 	cout << "Nodes after " << nodes.size() << endl;

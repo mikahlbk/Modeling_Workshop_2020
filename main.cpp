@@ -1,3 +1,5 @@
+#ifndef _MAIN_INCLUDE_
+#define _MAIN_INCLUDE_
 // Main.cpp
 //============================
 
@@ -24,7 +26,12 @@
 
 using namespace std;
 
-//============================
+//EXPERIMENTAL PARAMTERS
+int DIV_MECHANISM = 0;
+double WUS_RAD_CONTRACTION_FACTOR = 1;
+double CK_RAD_CONTRACTION_FACTOR = 1;
+//Must be declared in externs.h
+//For clarity, listed as comments in phys.h
 
 int main(int argc, char* argv[]) {
 
@@ -42,6 +49,22 @@ int main(int argc, char* argv[]) {
 	//without cytoplasm node info
 	string locations_no_cyt_folder = argv[2];
 	//keep track of time
+	for (int i = 1; i < argc; i++) { 
+		if (!strcmp(argv[i], "-WR")) { 
+			WUS_RAD_CONTRACTION_FACTOR = stod(argv[i+1]);
+		} else if (!strcmp(argv[i], "-CKR")) { 
+			CK_RAD_CONTRACTION_FACTOR = stod(argv[i+1]);
+		} else if (!strcmp(argv[i], "-div")) { 
+			DIV_MECHANISM = stoi(argv[i+1]);
+		}
+	}
+	if (DIV_MECHANISM == 0) { 
+		cout << "DIV_MECHANISM not set.  Exiting..." << endl;
+		exit(1);
+	} else if (DIV_MECHANISM > 3 || DIV_MECHANISM < 1) { 
+		cout << "DIV_MECHANISM Input failed. Exiting..." << endl;
+		exit(1);
+	}
 	int start = clock();	
 	mt19937::result_type seed = time(0);
 	
@@ -309,4 +332,4 @@ int main(int argc, char* argv[]) {
 
 
 
-
+#endif

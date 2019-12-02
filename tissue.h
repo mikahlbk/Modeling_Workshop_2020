@@ -17,6 +17,7 @@
 #include "coord.h"
 #include "node.h"
 #include "cell.h"
+#include "externs.h"
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>
 //=========================

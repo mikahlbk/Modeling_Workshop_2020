@@ -87,7 +87,7 @@ Coord Cyt_Node::calc_Morse_II(int Ti) {
 
 	vector<shared_ptr<Cyt_Node>>cyts;
 	my_cell->get_Cyt_Nodes_Vec(cyts);
-	shared_ptr<Cyt_Node> me= shared_from_this();
+	shared_ptr<Cyt_Node> me = shared_from_this();
 #pragma omp parallel
 	{	
 #pragma omp declare reduction(+:Coord:omp_out+=omp_in) initializer(omp_priv(omp_orig))
@@ -354,14 +354,24 @@ void Wall_Node::update_adh_vec(shared_ptr<Wall_Node> node) {
 //removes the current node from adhesion vector of
 //cell wall nodes from neighboring cells 
 void Wall_Node::remove_from_adh_vecs(){
+	unsigned int self_index;
 	shared_ptr<Wall_Node> me = shared_from_this();
 	vector<shared_ptr<Wall_Node>> neighbor_connections;
 	for (unsigned int i = 0; i < adhesion_vector.size(); i++){
+		self_index = 100;
 		neighbor_connections.clear();
 		neighbor_connections = adhesion_vector.at(i)->get_adh_vec();
+		for (unsigned int j = 0; j < neighbor_connections.size(); j++) { 
+
+			if (neighbor_connections.at(j) == me) { 
+				self_index = j;				
+			}
+		}
+		if (self_index == 100) 
+			cout << "I am not here!" << endl;
 		adhesion_vector.at(i)->clear_adhesion_vec();
 		for (unsigned int j = 0; j < neighbor_connections.size(); j++) {
-			if(neighbor_connections.at(j) != me){
+			if(j != self_index){
 				adhesion_vector.at(i)->adh_push_back(neighbor_connections.at(j));
 			}
 		}
@@ -454,10 +464,12 @@ Coord Wall_Node::calc_Morse_DC(int Ti) {
 	//cout << "getting neighbors" << endl;
 #pragma omp parallel 
 	{
+		if (Ti>1){
 #pragma omp declare reduction(+:Coord:omp_out+=omp_in) initializer(omp_priv(omp_orig))
 #pragma omp for reduction(+:Fdc) schedule(static,1) 
-		for (unsigned int i = 0; i < cells.size(); i++) {
-			Fdc += neighbor_nodes(cells.at(i), Ti);
+			for (unsigned int i = 0; i < cells.size(); i++) {
+				Fdc += neighbor_nodes(cells.at(i), Ti);
+			}
 		}
 	}
 	//cout << "Fdc" << Fdc << endl;
@@ -726,6 +738,34 @@ double Wall_Node::calc_Tensile_Stress() {
 	return TS;
 }
 
+//Tensile Stress V3
+/*double Wall_Node::calc_Tensile_Stress() { 
+	//Variable to store tensile stress is TS
+	Coord outward = calc_Outward_Vector();
+	Coord tangent = outward.perpVector();
+	double TS, TS_left, TS_right;
+	shared_ptr<Wall_Node> me = shared_from_this();
+	shared_ptr<Wall_Node> RNeighbor = me->get_Right_Neighbor();
+	shared_ptr<Wall_Node> LNeighbor = me->get_Left_Neighbor();
+	//Displacements of left and right node form this node)
+	Coord Delta_R = RNeighbor->get_Location() - me->get_Location();
+	Coord Delta_L = LNeighbor->get_Location() - me->get_Location();
+	TS_right = me->get_k_lin() * (Delta_R.length() - me->get_membr_len())
+		* Delta_R.dot(tangent) / (Delta_R.length());
+	TS_left = me->get_k_lin() * (Delta_L.length() - me->get_membr_len())
+		* Delta_L.dot(tangent) / (Delta_L.length());
+
+
+	//Naiive average of left and right tensile stress is TS.
+	TS = (TS_left + TS_right)/static_cast<double>(2);
+
+	//Include adhesion force in the direction tangent to the cell wall
+	
+	//calc_Morse_DC(int Ti) doesn't actually make use of Ti, just filling parameter.
+	Coord adh_force = calc_Morse_DC(1);
+	TS += abs(adh_force.dot(tangent));
+	return TS;
+}*/
 
 double Wall_Node::calc_Shear_Stress() { 
 	//Variable to store Shear stress is SS
