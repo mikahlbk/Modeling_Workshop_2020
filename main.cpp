@@ -26,6 +26,8 @@
 
 using namespace std;
 
+//FREQUENTLY CHANGED PARAMETERS
+bool OUT_OF_PLANE_GROWTH = true;
 //EXPERIMENTAL PARAMTERS
 int DIV_MECHANISM = 0;
 double WUS_RAD_CONTRACTION_FACTOR = 1;
@@ -56,6 +58,8 @@ int main(int argc, char* argv[]) {
 			CK_RAD_CONTRACTION_FACTOR = stod(argv[i+1]);
 		} else if (!strcmp(argv[i], "-div")) { 
 			DIV_MECHANISM = stoi(argv[i+1]);
+		} else if (!strcmp(argv[i], "-OOP_off")) { 
+			OUT_OF_PLANE_GROWTH = false;
 		}
 	}
 	if (DIV_MECHANISM == 0) { 
