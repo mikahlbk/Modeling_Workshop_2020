@@ -394,6 +394,17 @@ void Tissue::update_Cell_Locations(int Ti) {
 	return;
 }
 
+//Checks to see if the simulation is ready to stop by checking if
+//every cell is flagged as terminal.
+bool Tissue::terminal_Tissue() {
+	for (unsigned int i = 0; i < cells.size(); i++) { 
+		if (!(cells.at(i)->is_Terminal())) {
+			return false;
+		}
+	}
+	return true;
+}
+
 void Tissue::locations_output(ofstream& ofs, bool cytoplasm){
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->print_locations(ofs,cytoplasm);

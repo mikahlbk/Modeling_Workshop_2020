@@ -90,7 +90,7 @@ const bool L1_L2_FORCED_ANTICLINAL_DIV = true;
 
 //If the following is set to true, nonlinear growth rates are applied. False
 //is linear.
-//const bool NONLINEAR_GROWTH = true;
+const bool NONLINEAR_GROWTH = true;
 
 
 //If the following is set to false, then boundary division will not occur. This is also true for the L1 layer.
@@ -103,6 +103,15 @@ const int STEM_LAYER = 7;
 //2 - Chemically driven division
 //3 - Mechanical Division
 //int DIV_MECHANISM;
+
+
+//EXPERIMENTAL PARAMETER - TENSILE_CALC (integer)
+//Changes the method in which tensile stress is caluclated.
+//1 - Projection before calculating force, adhesion included (MMH/Hope used this)
+//2 - Projection before calculating force, adhesion excluded
+//3 - Projection after calculating force, adhesion included
+//4 - Projection after calculating force, adhesion excluded
+//int TENSILE_CALC;
 
 
 //EXPERIMENTAL PARAMETER - WUS Radius

@@ -9,4 +9,5 @@ extern int DIV_MECHANISM;
 extern double WUS_RAD_CONTRACTION_FACTOR;
 extern double CK_RAD_CONTRACTION_FACTOR;
 extern bool OUT_OF_PLANE_GROWTH;
+extern int TENSILE_CALC;
 #endif

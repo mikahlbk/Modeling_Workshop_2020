@@ -55,6 +55,7 @@ Cell::Cell(Tissue* tissue) {
 	//recent_div_MD = 0 means that no cells are recently divided
 	//same with recent_div = false
 	recent_div = false;
+	terminal = true;
 	recent_div_MD = 0;
 }
 //this constructor is used to initialize first set of cells
@@ -73,10 +74,13 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 	//set damping for cells that act as anchor points
 	if(this->stem == 1) {
 		this->damping = STEM_DAMP;
+		terminal = true;
 	} else if((this->boundary == 1)) {
 		this->damping =  BOUNDARY_DAMP;
+		terminal = true;
 	} else {
 		this->damping = REG_DAMP;
+		terminal = false;
 	}
 	life_length = 0;
 	//cyt nodes initialized in tissue constructor which
@@ -1085,6 +1089,7 @@ void Cell::division_check() {
 
 	bool cell_cycle_check = (this->Cell_Progress >= 30); 
 
+	//Case where the cell divides.
 	if (cross_section_check && boundary_check && cell_cycle_check) { 
 
 		cout << "dividing cell" << this->rank <<  endl;
@@ -1140,14 +1145,17 @@ void Cell::division_check() {
 		}
 		this->update_Neighbor_Cells(this->adh_neighbors,new_Cell);
 		this->clear_adhesion_vectors();
-		this->update_adhesion_springs();
+		this->update_adhesion_springs();	
+		set_Terminal(true);
 	} else if (!cross_section_check && cell_cycle_check) { 
+		//Case where the cell "divides out of plane"
 		this->reset_Cell_Progress();
 		if (unifRand() < 0.5) { 
 			set_Growing_This_Cycle(false);
 		} else { 
 			set_Growing_This_Cycle(true);
 		}
+		set_Terminal(true);
 	}
 	return;
 }

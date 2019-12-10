@@ -61,6 +61,9 @@ class Tissue{
 		void calc_New_Forces(int Ti);
 		void update_Cell_Locations(int Ti);
 		
+		//For tissue halting purposes
+
+		bool terminal_Tissue();
 		//stuff for data output
 		void plot_direction_vec(ofstream& ofs);
 		void print_Data_Output(ofstream& ofs);

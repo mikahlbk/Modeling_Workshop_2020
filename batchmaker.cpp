@@ -2,6 +2,8 @@
 #include <cstring>
 #include <fstream>
 #include <math.h>
+#include <vector>
+#include <string>
 #define PI 3.14159265
 using namespace std;
 
@@ -17,10 +19,16 @@ int main(int argc, char* argv[]) {
 	char mins[100] = "";
 	char nodes[100] = "";
 	char mem[100] = "";
+	vector<string> parameter_names;
+	vector<string> parameter_values;
 	char DPM[100] = "";
+	char TC[100] = "";
 	char WUS_CF[100]= "";
 	char CK_CF[100] = "";
+	string bigdata_path = "/bigdata/wchenlab/shared/Plant_SCE_output/";
+	string final_path;
 	int divDataCutoff;
+	bool bigdata = false;
 
 	for (int i = 1; i < argc; i++) { 
 		if (!strcmp(argv[i], "-p")) { 
@@ -39,12 +47,11 @@ int main(int argc, char* argv[]) {
 			strcpy(mem, argv[i+1]);
 		} else if (!strcmp(argv[i], "-help")) { 
 			goto helplabel;
-		} else if (!strcmp(argv[i], "-WR")) { 
-			strcpy(WUS_CF, argv[i+1]);
-		} else if (!strcmp(argv[i], "-CKR")) { 
-			strcpy(CK_CF, argv[i+1]);
-		} else if (!strcmp(argv[i], "-div")) { 
-			strcpy(DPM, argv[i+1]);
+		} else if (!strcmp(argv[i], "-par")) {
+			parameter_names.push_back(argv[i+1]);
+			parameter_values.push_back(argv[i+2]);
+		} else if (!strcmp(argv[i], "-bigdata")) { 
+			bigdata = true;
 		}
 	}
 
@@ -96,6 +103,11 @@ int main(int argc, char* argv[]) {
 	}
 	if (!strlen(mem)) strcpy(mem, "2");
 	if (!strlen(nodes)) strcpy(nodes,"1");
+
+
+	final_path = (bigdata) ? bigdata_path : "";
+
+
 	ofs << "#!/bin/bash -l\n";
 	ofs << "#SBATCH --nodes=" << nodes << "\n";
 	ofs << "#SBATCH --ntasks=1\n";
@@ -107,14 +119,17 @@ int main(int argc, char* argv[]) {
 	ofs << "#SBATCH -p " << p << " \n";
 
 	ofs << "export OMP_NUM_THREADS " << cores << "\n";
-	ofs << "mkdir Animate_Cyt_" << test << "\n";
-	ofs << "mkdir Nematic_test_1 \n";
-	ofs << "mkdir Locations_test_1\n";
-	ofs << "mkdir Animate_No_Cyt_" << test << "\n";
-	ofs << "./program Animate_Cyt_" << test << " Locations_test_" << test << " Nematic_test_" 
-		<< test << " Animate_No_Cyt_" << test << 
-		 " -WR " << WUS_CF << " -CKR " << CK_CF << " -div "
-		<< DPM << "\n";
+	ofs << "mkdir " << final_path << "Animate_Cyt_" << test << "\n";
+	ofs << "mkdir " << final_path << "Nematic_test_1\n";
+	ofs << "mkdir " << final_path << "Locations_test_1\n";
+	ofs << "mkdir " << final_path << "Animate_No_Cyt_" << test << "\n";
+	ofs << "./program " << final_path << "Animate_Cyt_" << test << " " 
+		<< final_path << "Locations_test_" << test << " " 
+		<< final_path << "Nematic_test_" << test << " " 
+		<< final_path << "Animate_No_Cyt_" << test;
+	for (unsigned int i = 0; i < parameter_values.size(); i++ ) { 
+		ofs << " " << parameter_names.at(i) << " " << parameter_values.at(i);
+	}
 	ofs.close();
 
 

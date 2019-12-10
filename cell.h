@@ -52,6 +52,7 @@ class Cell: public enable_shared_from_this<Cell> {
 		shared_ptr<Wall_Node> left_Corner;
 		bool recent_div;
 		//0 is interphase, 1 is Mother, 2 is Daughter
+		bool terminal; //When all cells are marked as terminal, simulation stops.
 		int recent_div_MD;
 	public:
 
@@ -128,6 +129,11 @@ class Cell: public enable_shared_from_this<Cell> {
 		void set_Left_Corner(shared_ptr<Wall_Node> new_left_corner);
 		shared_ptr<Wall_Node> get_Left_Corner() {return left_Corner;}			      //is this necessary?
 		void set_Wall_Count(int number_nodes);
+		//set/get cell terminal state
+		void set_Terminal(bool t);
+		bool is_Terminal(){return terminal;}
+
+		//Computations
 		double compute_membr_thresh(shared_ptr<Wall_Node> current);
 		double compute_k_lin(shared_ptr<Wall_Node> current);
 		double compute_k_bend(shared_ptr<Wall_Node> current);

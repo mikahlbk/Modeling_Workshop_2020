@@ -8,17 +8,17 @@ and run it with
 
 ./CSV_interpreter.out <csv file name>.csv
 
-
-In: CSV file organized as follows:
+INPUT: First row index K; CSV file organized as follows: 
 
 -batchmaker_flag_1,flag_value_1, ...,-batchmaker_flag_M,flag_value_M,-test,NAME
 -parameter_flag_1,...,-parameter_flag_P
-x11,x12,...,x1P
+xK1,x12,...,xKP
+x(K+1)1,x(k+2)2,...,x(K+1)P
 ...
-xN1,XN2,...,XNP
+x(K+N)1,X(K+N)2,...,X(K+N)P
 
-Out: N simulations submitted with parameter vectors (Xk1,...,XkP)
-submitted via slurm as NAME_1, ... , NAME_N. 
+OUTPUT: N simulations submitted with parameter vectors (Xk1,...,XkP)
+submitted via slurm as NAME_K, NAME_(K+1), ... , NAME_(K+N). 
 
 List of batchmaker_flags (Optional marked with *)
 -test <NAME>

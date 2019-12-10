@@ -24,7 +24,6 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 	string CSVname = argv[1];
-	cout << CSVname;
 	//Declare ifstream CSV
 	ifstream CSV(CSVname.c_str()); 
 	if(!CSV) { 
@@ -36,7 +35,11 @@ int main(int argc, char* argv[]) {
 	//initialize variables
 	string cell;
 	string line;	
+	//Iterator for the loop
 	int k;
+	cout << "Please enter integer k for row 1's index: ";
+	cin >> k;
+	k = k-1;
 	vector<string> batch_info;
 	batch_info.clear();
 	vector<string> parameter_names;
@@ -50,7 +53,6 @@ int main(int argc, char* argv[]) {
 	string command_base = "./batchGenerator.out ";
 	getline(CSV,line);
 	stringstream ss(line);
-	cout << command_base << endl;
 	//Get parameter names to store flags, and batch info.
 	//test_name_index
 	unsigned int NI = 0;
@@ -60,7 +62,6 @@ int main(int argc, char* argv[]) {
 		if (!strcmp(cell.c_str(),"-test")) { 
 			test_name_index = NI;
 		}
-		cout << cell << endl;
 		batch_info.push_back(cell);
 	}
 	if (!ss && cell.empty()) {
@@ -73,15 +74,12 @@ int main(int argc, char* argv[]) {
 	while(getline(ss,cell,',') ){ 
 		parameter_names.push_back(cell);	
 	}
-	k = 0;
-
 	//Loop through the kth row, build and submit the simulation.
 	while(getline(CSV,line)) { 
 		k++;
 		parameters.clear();
 		ss.str("");
 		ss.clear();
-		cout << "Line M1_" << k << ": " << line << endl;
 		ss.str(line);
 		while(getline(ss,cell,',')) {
 			parameters.push_back(cell);
@@ -103,7 +101,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 		for (unsigned int i = 0; i < parameters.size(); i++) { 
-			command << parameter_names.at(i) + " " + parameters.at(i) + " ";
+			command << "-par " + parameter_names.at(i) + " " + parameters.at(i) + " ";
 		}
 		cout << endl << "Command: " << command.str() << endl;
 		//Submits command to bash to generate AUTO_BATCH.sh.

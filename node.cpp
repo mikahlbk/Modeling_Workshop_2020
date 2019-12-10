@@ -723,9 +723,24 @@ double Wall_Node::calc_Tensile_Stress() {
 	//Displacements of left and right node form this node)
 	Coord Delta_R = RNeighbor->get_Location() - me->get_Location();
 	Coord Delta_L = LNeighbor->get_Location() - me->get_Location();
-	TS_left = me->get_k_lin() * (Delta_R.projectOnto(tangent).length() - me->get_membr_len());
-	TS_right = me->get_k_lin() * (Delta_L.projectOnto(tangent).length() - me->get_membr_len());
-
+	if (TENSILE_CALC == 1 || TENSILE_CALC == 2) {
+		TS_left = me->get_k_lin() * (Delta_R.projectOnto(tangent).length() - me->get_membr_len());
+		TS_right = me->get_k_lin() * (Delta_L.projectOnto(tangent).length() - me->get_membr_len());
+	} else if (TENSILE_CALC == 3 || TENSILE_CALC == 4) { 
+		TS_right = (
+			Delta_R * ((
+				me->get_k_lin() *
+				(Delta_R.length() - me->get_membr_len())
+				)/(Delta_R.length()))
+		).projectOnto(tangent).length();
+		
+		TS_left = (
+			Delta_L * ((
+				me->get_k_lin() *
+				(Delta_L.length() - me->get_membr_len())
+				)/(Delta_L.length()))
+		).projectOnto(tangent).length();
+	}
 
 	//Naiive average of left and right tensile stress is TS.
 	TS = (TS_left + TS_right)/static_cast<double>(2);
@@ -733,8 +748,10 @@ double Wall_Node::calc_Tensile_Stress() {
 	//Include adhesion force in the direction tangent to the cell wall
 	
 	//calc_Morse_DC(int Ti) doesn't actually make use of Ti, just filling parameter.
+	
 	Coord adh_force = calc_Morse_DC(1);
-	TS += abs(adh_force.dot(tangent));
+	if (TENSILE_CALC == 1 || TENSILE_CALC == 3) 
+		TS += abs(adh_force.dot(tangent));
 	return TS;
 }
 

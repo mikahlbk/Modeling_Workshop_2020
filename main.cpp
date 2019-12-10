@@ -32,6 +32,7 @@ bool OUT_OF_PLANE_GROWTH = true;
 int DIV_MECHANISM = 0;
 double WUS_RAD_CONTRACTION_FACTOR = 1;
 double CK_RAD_CONTRACTION_FACTOR = 1;
+int TENSILE_CALC = 1;
 //Must be declared in externs.h
 //For clarity, listed as comments in phys.h
 
@@ -58,6 +59,8 @@ int main(int argc, char* argv[]) {
 			CK_RAD_CONTRACTION_FACTOR = stod(argv[i+1]);
 		} else if (!strcmp(argv[i], "-div")) { 
 			DIV_MECHANISM = stoi(argv[i+1]);
+		} else if (!strcmp(argv[i], "-TC")) { 
+			TENSILE_CALC = stoi(argv[i+1]);
 		} else if (!strcmp(argv[i], "-OOP_off")) { 
 			OUT_OF_PLANE_GROWTH = false;
 		}
@@ -134,18 +137,23 @@ int main(int argc, char* argv[]) {
 	string locations_initial = "/Locations_";
 	int out3 = 0;
 
+	//(No longer use this loop, instead flag for terminal.)
 	//loop for time steps
 	//which matlab file tells you how many
 	//seconds each time step reprsents (2.5?)
-	for(int Ti = 0; Ti*dt < numSteps; Ti++) {
+	//for(int Ti = 0; Ti*dt < numSteps; Ti++) {
 
-
+	int terminal_timer = 0;
+	bool is_terminal = false;
+	while(terminal_timer < 3000) {
 		//keep track of simulation runs
-		if (Ti %1000 == 0) {
+		if (Ti %1000 == 0 && !is_terminal) {
+			is_terminal = growing_Tissue.terminal_Tissue();
+			if (is_terminal) {
 
-			//cout << "Simulation still running. Ti: " << Ti << endl;
-			//growing_Tissue.NAN_CATCH(Ti);
-
+			}
+		} else { 
+			terminal_timer++;
 		}
 
 		// Tissue Growth
@@ -221,7 +229,7 @@ int main(int argc, char* argv[]) {
 		//cout << "Finished" << endl;
 
 		// print to dataOutput and vtk files
-		if(Ti%500==0) {
+		if(Ti%2500==0) {
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
 				Number = "0000" + to_string(out);
