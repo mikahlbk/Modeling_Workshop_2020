@@ -91,8 +91,8 @@ int main(int argc, char* argv[]) {
 	int num_samples;
 	cout << "Enter number of samples:" << endl;
 	cin >> num_samples;
-	if (num_samples <= P) { 
-		cout << "number of samples must be > P" << endl;
+	if (num_samples < P) { 
+		cout << "number of samples must be >= P" << endl;
 		exit(1);
 	}
 	vector<vector<int>> X_sample_bins;
