@@ -130,6 +130,7 @@ int main(int argc, char* argv[]) {
 	for (unsigned int i = 0; i < parameter_values.size(); i++ ) { 
 		ofs << " " << parameter_names.at(i) << " " << parameter_values.at(i);
 	}
+	ofs << endl;
 	ofs.close();
 
 
