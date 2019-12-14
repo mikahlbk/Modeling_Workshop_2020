@@ -121,9 +121,21 @@ const int STEM_LAYER = 7;
 //Contracts radius of template for CK 
 //double CK_RAD_CONTRACTION_FACTOR;
 
+
+//EXPERIMENTAL PARAMETER - OOP_PROBABILITY
+//Defined in top of main.cpp, externs.h
+//Probability that something will grow out of plane, recalculated
+//every division cycle.
+//double OOP_PROBABILITY = 0.5 (Default)
+
+
 /////// VTK parameters
 //Tensile stress cytoplasm color (Calibrated from circle value)
 const double CYT_COLOR = 42.0;
 ////=====================
+
+
+//extern int NUM_STEPS_PER_FRAME
+//extern int RECENT_DIV_NUM_FRAMES
 #endif
 

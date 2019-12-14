@@ -749,14 +749,14 @@ shared_ptr<Cell> Cell::division() {
 	this->calc_CK(L1_AVG);
 	sister->calc_CK(L1_AVG);
 
-	if(unifRand() < 0.5) { 
+	if(unifRand() < OOP_PROBABILITY) { 
 		sister->set_Growing_This_Cycle(false);
 	} else { 
 		sister->set_Growing_This_Cycle(true);
 	}
 
-	this->set_growth_rate();
-	sister->set_growth_rate();
+	this->set_growth_rate(true);
+	sister->set_growth_rate(true);
 
 
 	cout << "Reassign cyt nodes" << endl;
@@ -782,7 +782,7 @@ shared_ptr<Cell> Cell::division() {
 			temp_cyts.at(i)->update_Cell(this_cell);
 			this->update_cyt_node_vec(temp_cyts.at(i));
 			//cout << temp_cyts.at(i)->get_Location() << endl;
-			this->Cell_Progress++;
+			//this->Cell_Progress++;
 			//cout << "this" << endl;
 			//cout << "my cell: " << temp_cyts.at(i)->get_My_Cell() << endl;
 			//if(length_1 < 4){
@@ -793,7 +793,7 @@ shared_ptr<Cell> Cell::division() {
 			temp_cyts.at(i)->update_Cell(sister);
 			sister->update_cyt_node_vec(temp_cyts.at(i));
 			//cout << temp_cyts.at(i)->get_Location() << endl;
-			sister->update_Cell_Progress();
+			//sister->update_Cell_Progress();
 			//cout << "sister" << endl;
 			//cout << "My cell" << temp_cyts.at(i)->get_My_Cell() << endl;
 			//if(length_2 < 4){
@@ -805,8 +805,8 @@ shared_ptr<Cell> Cell::division() {
 		//counter++;
 		//cout << "counter" <<  counter << endl;
 	}
-	this->set_Init_Cell_Progress(this->Cell_Progress);
-	sister->set_Init_Cell_Progress(sister->get_Cell_Progress());
+	this->set_Init_Num_Nodes(get_cyt_count());
+	sister->set_Init_Num_Nodes(sister->get_cyt_count());
 	//move cyt nodes that are too close 
 	//to the new cell wall
 	//cout << "sister" << sister->get_cyt_count()<< endl;
@@ -836,7 +836,7 @@ shared_ptr<Cell> Cell::division() {
 	} while (curr_wall != sis_left_Corner);
 	cout << endl;
 
-	if (unifRand() < 0.5) {  
+	if (unifRand() < OOP_PROBABILITY) {  
 		set_Growing_This_Cycle(false);
 	} else { 
 		set_Growing_This_Cycle(true);

@@ -24,7 +24,7 @@
 // Tissue Class Declaration
 
 //class Tissue: public enable_shared_from_this<Tissue> {
-class Tissue{
+class Tissue {
 	private:
 		// We'll need a better data structure for later
 		vector<shared_ptr<Cell>> cells;

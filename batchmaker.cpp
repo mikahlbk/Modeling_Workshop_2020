@@ -120,8 +120,8 @@ int main(int argc, char* argv[]) {
 
 	ofs << "export OMP_NUM_THREADS " << cores << "\n";
 	ofs << "mkdir " << final_path << "Animate_Cyt_" << test << "\n";
-	ofs << "mkdir " << final_path << "Nematic_test_1\n";
-	ofs << "mkdir " << final_path << "Locations_test_1\n";
+	ofs << "mkdir " << final_path << "Nematic_test_" << test <<"\n";
+	ofs << "mkdir " << final_path << "Locations_test_" << test << "\n";
 	ofs << "mkdir " << final_path << "Animate_No_Cyt_" << test << "\n";
 	ofs << "./program " << final_path << "Animate_Cyt_" << test << " " 
 		<< final_path << "Locations_test_" << test << " " 

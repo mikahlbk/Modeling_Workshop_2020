@@ -55,7 +55,7 @@ Cell::Cell(Tissue* tissue) {
 	//recent_div_MD = 0 means that no cells are recently divided
 	//same with recent_div = false
 	recent_div = false;
-	terminal = true;
+	set_Terminal(true);
 	recent_div_MD = 0;
 }
 //this constructor is used to initialize first set of cells
@@ -74,13 +74,13 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 	//set damping for cells that act as anchor points
 	if(this->stem == 1) {
 		this->damping = STEM_DAMP;
-		terminal = true;
+		set_Terminal(true);
 	} else if((this->boundary == 1)) {
 		this->damping =  BOUNDARY_DAMP;
-		terminal = true;
+		set_Terminal(true);
 	} else {
 		this->damping = REG_DAMP;
-		terminal = false;
+		set_Terminal(false);
 	}
 	life_length = 0;
 	//cyt nodes initialized in tissue constructor which
@@ -89,10 +89,19 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 	//wall nodes initialized in tissue constructor which 
 	//calls the make nodes function on each new cell
 	num_wall_nodes = 0;
+
+	if (unifRand()  < OOP_PROBABILITY) { 
+		set_Growing_This_Cycle(false);
+	} else { 
+		set_Growing_This_Cycle(true);
+	}
+	set_Init_Num_Nodes(static_cast<double>(Init_Num_Cyt_Nodes));
+
+
 	if((this->layer == 1)||(this->layer == 2)){
-		Cell_Progress = unifRandInt(5,10);
+		Cell_Progress = unifRand(0.25,0.5);
 	} else {
-		Cell_Progress = unifRandInt(10,14);
+		Cell_Progress = unifRand(0.5,0.75);
 	}
 	//Cell_Progress = unifRandInt(0,10);
 	this->cell_center = center;
@@ -114,14 +123,9 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 			this->growth_direction = Coord(0,1);
 		}
 	}
-
-	if (unifRand()  < 0.5) { 
-		set_Growing_This_Cycle(false);
-	} else { 
-		set_Growing_This_Cycle(true);
-	}
 	recent_div = false;
 	recent_div_MD = 0;
+
 
 	//cout << "layer" << this->layer << endl;
 	//cout << "stem" << this->stem << endl;
@@ -253,8 +257,11 @@ void Cell::make_nodes(double radius){
 	}	
 	//double new_damping = this->get_Damping();
 	//insert cytoplasm nodes
-	int num_init_cyt_nodes = Init_Num_Cyt_Nodes + Cell_Progress;
-	this->Cell_Progress = num_init_cyt_nodes;
+	//int num_init_cyt_nodes = Init_Num_Cyt_Nodes + Cell_Progress;
+	int num_init_cyt_nodes = floor(
+				calc_Cell_Maturity(is_Growing_This_Cycle()) 
+			);
+	//this->Cell_Progress = num_init_cyt_nodes;
 	double scal_x_offset = 0.8;
 	//Coord location;
 	double x;
@@ -303,6 +310,9 @@ void Cell::set_Damping(double new_damping) {
 	this->damping = new_damping;
 	return;
 }
+//Life length is the number of time steps this cell has lived 
+//in order to be at its current cell progress (Not actually the time since
+//creation, since changing this changes growth rate.
 void Cell::update_Life_Length() {
 	life_length++;
 	return;
@@ -336,10 +346,11 @@ void Cell::reset_Cell_Progress(){
 	this->Cell_Progress = 0;
 	return;
 }
+/*
 void Cell::update_Cell_Progress() {
 	this->Cell_Progress++;
 	return;
-}
+}*/
 void Cell::calc_WUS(Coord L1_AVG) {
 	
 	//new data from eric
@@ -369,7 +380,7 @@ void Cell::calc_CK(Coord L1_AVG) {
 
 	return;
 }
-void Cell::set_growth_rate() {
+void Cell::set_growth_rate(bool first_growth_rate) {
 	//first quartile is 15-21 hours
 	//second quartile is 21-27 hours
 	//third qurtile is 27-39 hours
@@ -379,6 +390,12 @@ void Cell::set_growth_rate() {
 	//second distribution mean/sigma 14400/1800
 	//third distribution mean/sigma 19800/3600
 	//fourth distribution mean/sigma 39600/16200
+	
+	int old_growth_rate;
+	if (!first_growth_rate) {
+		old_growth_rate = growth_rate;
+	}
+
 	if(this->wuschel <55 ) {
 		//cout << "Count 1: " << my_tissue->return_counts(0) << endl;
 		this->growth_rate = this->my_tissue->get_next_random(1,this->my_tissue->return_counts(0));
@@ -492,6 +509,19 @@ void Cell::set_growth_rate() {
 	  }*/
 
 
+	if(!first_growth_rate) { 
+		rescale_Life_Length(old_growth_rate);
+	}
+
+	return;
+}
+void Cell::rescale_Life_Length(int old_growth_rate) { 
+	if (old_growth_rate == this->growth_rate) { 
+		return;
+	}
+	Cell_Progress = (double)life_length / (double)(30*old_growth_rate);
+	this->life_length = floor(Cell_Progress * 
+			static_cast<double>(30*this->growth_rate));
 	return;
 }
 void Cell::update_growth_direction(){
@@ -532,6 +562,10 @@ void Cell::set_Left_Corner(shared_ptr<Wall_Node> new_left_corner) {
 }
 void Cell::set_Wall_Count(int number_nodes) {
 	this->num_wall_nodes = number_nodes;
+	return;
+}
+void Cell::set_Terminal(bool t) { 
+	this->terminal = t;
 	return;
 }
 double Cell::compute_membr_thresh(shared_ptr<Wall_Node> current) {
@@ -1019,9 +1053,10 @@ void Cell::update_Node_Locations(int Ti) {
 	//update cell_Center
 	update_Cell_Center();
 	//update wall_angles
-	if((this->life_length == 2000)) {
-		update_Wall_Equi_Angles();
-	}
+	/*if((this->life_length == 2000)) {
+	 * update wall equi angles();
+	}*/
+	update_Wall_Equi_Angles();
 	update_Wall_Angles();
 	//cout << "done" << endl;
 	return;
@@ -1035,43 +1070,39 @@ void Cell::update_Node_Locations(int Ti) {
 void Cell::update_Cell_Progress(int& Ti) {
 	//update life length of the current cell
 	this->update_Life_Length();
-	if(life_length > 5000){
+	int cutoff_time = RECENT_DIV_NUM_FRAMES * NUM_STEPS_PER_FRAME;
+	if(life_length > cutoff_time) {
 		this->recent_div = false;
 		this->set_MD(0);
 	}
-	//stem and boundary?	
 
-	double fraction = static_cast<double>((Ti%growth_rate)) 
-		/ static_cast<double>(growth_rate);
-	if (fraction == 0) {
-		Cell_Progress++;
-	}
-
-	double current_cp = Cell_Progress + fraction;
-	double maturity = calc_Cell_Maturity(current_cp);
-
+	Cell_Progress = static_cast<double>(this->life_length) /
+		static_cast<double>(30*this->growth_rate);
 	bool cross_section_check = 
 		this->growing_this_cycle || !OUT_OF_PLANE_GROWTH;
+	double maturity = calc_Cell_Maturity(cross_section_check);
+	double max_maturity = (cross_section_check) ? 31 : 23;
 
-	if(maturity >= num_cyt_nodes + 1 && maturity < 31) {
+	if (maturity >= num_cyt_nodes + 1 && maturity < max_maturity) {
 		//cout << "cyt node added "<< endl;
 		if (cross_section_check) this->add_Cyt_Node();
-	}
+	} 
 	return;
 }
 
-double Cell::calc_Cell_Maturity(double current_cp) { 
+double Cell::calc_Cell_Maturity(bool cross_section_check) { 
 	double maturity;
-	if (NONLINEAR_GROWTH) { 
-		double start = this->get_Init_Cell_Progress();
-		start = (start < 15) ? start : 15;
-		double finish = (Cell_Progress < 30) ? 30 : Cell_Progress;
-		double ccp_normalized = (current_cp-start)/(finish-start);
-		double maturity_normalized = pow(ccp_normalized, 2.0/3.0);
-		maturity = maturity_normalized *(finish-start) + start;
+	double finish;
+	if (cross_section_check) { 
+		finish = 30;
 	} else { 
-		maturity = current_cp;
+		finish = 22;
 	}
+	double exponent = (NONLINEAR_GROWTH) ? 2.0/3.0 : 1.0;
+	double start = this->get_Init_Num_Nodes();
+	if (start >= finish) finish = start + 1;
+	double maturity_normalized = pow(this->Cell_Progress, exponent);
+	maturity = maturity_normalized * (finish-start) + start;
 
 	return maturity;
 }
@@ -1087,7 +1118,7 @@ void Cell::division_check() {
 	bool boundary_check = 
 		(this->boundary == 0 && this->stem == 0) || BOUNDARY_DIVISION;
 
-	bool cell_cycle_check = (this->Cell_Progress >= 30); 
+	bool cell_cycle_check = (this->Cell_Progress >= 1); 
 
 	//Case where the cell divides.
 	if (cross_section_check && boundary_check && cell_cycle_check) { 
@@ -1114,6 +1145,7 @@ void Cell::division_check() {
 		cout << "Parent progress: " << this->get_Cell_Progress() << endl;
 		cout << "New cell: " << new_Cell << endl;
 		cout << "New progress: " << new_Cell->get_Cell_Progress() << endl;
+		//for printing mother/daughter
 		this->recent_div = true;
 
 		//layer in division function		
@@ -1209,8 +1241,8 @@ void Cell::set_Growing_This_Cycle(bool gtc) {
 	this->growing_this_cycle = gtc;
 	return;
 }
-void Cell::set_Init_Cell_Progress(double icp) { 
-	this->init_Cell_Progress = icp;
+void Cell::set_Init_Num_Nodes(double inn) { 
+	this->init_Num_Nodes = inn;
 	return;
 }
 void Cell::add_Wall_Node_Check(int Ti) {
@@ -1646,6 +1678,7 @@ void Cell::print_direction_vec(ofstream& ofs){
 
 	return;
 }
+//LOCATIONS
 void Cell::print_locations(ofstream& ofs,bool cytoplasm) {
 	///ofs << this->get_Rank() << ' ' << this->get_Layer();
 	shared_ptr<Wall_Node> curr_wall = left_Corner;
@@ -1658,6 +1691,7 @@ void Cell::print_locations(ofstream& ofs,bool cytoplasm) {
 
 		Coord loc = curr_wall->get_Location();
 		ofs << this->get_Rank()<<' '<< loc.get_X() << ' ' << loc.get_Y() << " 1 " << num_neighbors <<  endl;
+		//Add 
 		//cout<< "maybe cant do left neighbor" << endl;
 		curr_wall = curr_wall->get_Left_Neighbor();
 
@@ -2001,6 +2035,22 @@ void Cell::print_VTK_MD(ofstream& ofs, bool cytoplasm) {
 	return;
 }
 
+void Cell::print_VTK_OOP(ofstream& ofs, bool cytoplasm) {
+	shared_ptr<Wall_Node> currW = left_Corner;
+	bool OOP_Flag = this->growing_this_cycle;
+	unsigned int color = (OOP_Flag) ? 1 : 0;
+	do {
+		ofs << color << endl;
+		currW = currW->get_Left_Neighbor();
+	} while(currW != left_Corner);
+	if (cytoplasm) {
+		for(unsigned int i = 0; i < cyt_nodes.size(); i++) {
+			ofs << color << endl;
+		}
+	}
+	return;
+}
+
 vector<pair<double,shared_ptr<Wall_Node>>> Cell::get_Angle_Wall_Sorted() { 
 	vector<shared_ptr<Wall_Node>> mother_walls;
 	this->get_Wall_Nodes_Vec(mother_walls);
@@ -2272,11 +2322,6 @@ void Cell::NAN_CATCH(int Ti) {
 		}	
 	}
 	//update cell_Center
-	update_Cell_Center();
-	//update wall_angles
-	if((this->life_length == 2000)) {
-		update_Wall_Equi_Angles();
-	}
 	return;
 }
 //////////////////////////////////

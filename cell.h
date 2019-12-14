@@ -43,7 +43,7 @@ class Cell: public enable_shared_from_this<Cell> {
 		double cytokinin;
 		double wuschel;
 		int growth_rate;
-		double init_Cell_Progress;
+		double init_Num_Nodes;
 		double perimeter;
 		bool growing_this_cycle;
 		Coord growth_direction;
@@ -77,6 +77,7 @@ class Cell: public enable_shared_from_this<Cell> {
 		double get_Damping() {return damping;}
 		//set/get life length
 		void update_Life_Length();
+		void rescale_Life_Length(int old_growth_rate);
 		int get_life_length() {return life_length;} 
 		void reset_Life_Length();
 		//get total node count
@@ -98,10 +99,10 @@ class Cell: public enable_shared_from_this<Cell> {
 		//reset cell_Progress
 		void reset_Cell_Progress();
 		//set/get cell progress
-		void update_Cell_Progress();
+		void update_Cell_Progress(int& Ti);
 		double get_Cell_Progress() {return Cell_Progress;}
-		double get_Init_Cell_Progress() {return init_Cell_Progress;}
-		void set_Init_Cell_Progress(double icp);
+		double get_Init_Num_Nodes() {return init_Num_Nodes;}
+		void set_Init_Num_Nodes(double inn);
 		//get cell center
 		void update_Cell_Center();
 		Coord get_Cell_Center() {return cell_center;}
@@ -112,7 +113,7 @@ class Cell: public enable_shared_from_this<Cell> {
 		double get_CYT_concentration() {return cytokinin;}
 		double getRandomDoubleUsingNormalDistribution(double mean, double sigma);
 		//set growth rate based on WUS
-		void set_growth_rate();
+		void set_growth_rate(bool first_growth_rate);
 		int get_growth_rate(){return growth_rate;}
 		//set/get growth direction
 		void update_growth_direction();
@@ -121,7 +122,7 @@ class Cell: public enable_shared_from_this<Cell> {
 		Coord get_growth_direction(){return growth_direction;}
 		//get current neighbor cells		
 		void get_Neighbor_Cells(vector<shared_ptr<Cell>>& cells);
-		//set/get growing_this_round
+		//set/get growing_this_cycle
 		void set_Growing_This_Cycle(bool gtc);
 		bool is_Growing_This_Cycle(){return growing_this_cycle;}
 		void get_ADH_Neighbors_Vec(vector<shared_ptr<Cell>>& adh_neighbs);
@@ -158,8 +159,8 @@ class Cell: public enable_shared_from_this<Cell> {
 		void update_Node_Locations(int Ti);
 
 		//Growth of a cell
-		void update_Cell_Progress(int& Ti);
-		double calc_Cell_Maturity(double current_cp);
+		//void update_Cell_Progress(int& Ti);
+		double calc_Cell_Maturity(bool cross_section_check);
 		void division_check();
 		double calc_Area();
 		void add_Wall_Node_Check(int Ti);
@@ -220,6 +221,8 @@ class Cell: public enable_shared_from_this<Cell> {
 		void print_VTK_Corners(ofstream& ofs, bool cytoplasm);
 		void print_VTK_Growth_Dir(ofstream& ofs, bool cytoplasm); 
 		void print_VTK_MD(ofstream& ofs, bool cytoplasm);
+		void print_VTK_OOP(ofstream& ofs, bool cytoplasm);
+
 		vector<pair<double,shared_ptr<Wall_Node>>> get_Angle_Wall_Sorted();
 		vector<shared_ptr<Wall_Node>> get_Corner_Nodes();
 		void set_MD(int n){ recent_div_MD = n; return;}

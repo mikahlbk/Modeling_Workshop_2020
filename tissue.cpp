@@ -276,7 +276,7 @@ void Tissue::update_Signal(){
 		//cout << "CK" << endl;
 		cells.at(i)->calc_CK(L1_AVG);
 		//cout << "GROWTH RATE" << endl;
-		cells.at(i)->set_growth_rate();
+		cells.at(i)->set_growth_rate(false);
 		//cout<< "growth rate: " << i << " " << cells.at(i)->get_growth_rate() << endl;
 	}
 	return;
@@ -699,6 +699,14 @@ void Tissue::print_VTK_File(ofstream& ofs, bool cytoplasm) {
 	ofs << "LOOKUP_TABLE discrete_colors" << endl;
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->print_VTK_MD(ofs, cytoplasm);
+	}
+	ofs << endl;
+
+
+	ofs << "Scalars OOP_Flag float64" << 1 << endl;
+	ofs << "LOOKUP_TABLE discrete_colors" << endl;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->print_VTK_OOP(ofs, cytoplasm);
 	}
 	ofs << endl;
 

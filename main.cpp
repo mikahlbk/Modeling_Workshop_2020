@@ -29,10 +29,13 @@ using namespace std;
 //FREQUENTLY CHANGED PARAMETERS
 bool OUT_OF_PLANE_GROWTH = true;
 //EXPERIMENTAL PARAMTERS
-int DIV_MECHANISM = 0;
+double OOP_PROBABILITY = 0.5; //Defaults to 0.5
+int DIV_MECHANISM = 1;
 double WUS_RAD_CONTRACTION_FACTOR = 1;
 double CK_RAD_CONTRACTION_FACTOR = 1;
 int TENSILE_CALC = 1;
+int NUM_STEPS_PER_FRAME = 2500;
+int RECENT_DIV_NUM_FRAMES = 10;
 //Must be declared in externs.h
 //For clarity, listed as comments in phys.h
 
@@ -63,7 +66,9 @@ int main(int argc, char* argv[]) {
 			TENSILE_CALC = stoi(argv[i+1]);
 		} else if (!strcmp(argv[i], "-OOP_off")) { 
 			OUT_OF_PLANE_GROWTH = false;
-		}
+		} else if (!strcmp(argv[i], "-OOP_P")) { 
+			OOP_PROBABILITY = stod(argv[i+1]);
+		} 
 	}
 	if (DIV_MECHANISM == 0) { 
 		cout << "DIV_MECHANISM not set.  Exiting..." << endl;
@@ -109,7 +114,7 @@ int main(int argc, char* argv[]) {
 	//growing_Tissue.update_growth_direction();
 	//cout << "growth direction" << endl;
 	//parameters for time step
-	double numSteps = 500;
+	//double numSteps = 500;
 
 	// Variable for dataoutput
 	int digits;
@@ -143,15 +148,13 @@ int main(int argc, char* argv[]) {
 	//seconds each time step reprsents (2.5?)
 	//for(int Ti = 0; Ti*dt < numSteps; Ti++) {
 
+	int Ti = 0;
 	int terminal_timer = 0;
 	bool is_terminal = false;
 	while(terminal_timer < 3000) {
 		//keep track of simulation runs
-		if (Ti %1000 == 0 && !is_terminal) {
-			is_terminal = growing_Tissue.terminal_Tissue();
-			if (is_terminal) {
-
-			}
+		if (!is_terminal) {
+			if (Ti%1000 == 0) is_terminal = growing_Tissue.terminal_Tissue();
 		} else { 
 			terminal_timer++;
 		}
@@ -229,7 +232,7 @@ int main(int argc, char* argv[]) {
 		//cout << "Finished" << endl;
 
 		// print to dataOutput and vtk files
-		if(Ti%2500==0) {
+		if(Ti % NUM_STEPS_PER_FRAME==0) {
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
 				Number = "0000" + to_string(out);
@@ -307,7 +310,7 @@ int main(int argc, char* argv[]) {
 			Number2++;
 		}*/
 		//locations with cyt nodes
-		if(Ti%10000 == 0){
+		if(Ti % NUM_STEPS_PER_FRAME == 0){
 			Locations_no_cyt = locations_no_cyt_folder + locations_initial + to_string(out2) + ".txt";
 			ofs_loc_no_cyt.open(Locations_no_cyt.c_str());
 			growing_Tissue.locations_output(ofs_loc_no_cyt,false);
@@ -321,6 +324,7 @@ int main(int argc, char* argv[]) {
 		}
 		//growing_Tissue.BAD_CATCH(12,Ti);
 
+		Ti++;
 	}
 	/*nem_Filename = nematic_folder + nem_initial + to_string(Number2) + ".txt";
 	  ofs_nem.open(nem_Filename.c_str());
