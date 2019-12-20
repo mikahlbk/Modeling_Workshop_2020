@@ -103,12 +103,12 @@ Please enter integer k for row 1's index: 3
 Parameter set 3
 3 3
 Command: ./batchGenerator.out -p batch -hours 24 -cores 12 -test TEST_NAME_3 -par -WR
-0.7 -par -CK 1 -par -div 3 -par -TC 3
+0.7 -par -CK 1 -par -div 3 -par -TC 3 -flag OOP_off
 Submitted batch job 539277
 Parameter set 4
 2 4
 Command: ./batchGenerator.out -p batch -hours 24 -cores 12 -test TEST_NAME_4 -par -WR
-0.7 -par -CK 1 -par -div 2 -par -TC 4
+0.7 -par -CK 1 -par -div 2 -par -TC 4 -flag OOP_off
 Submitted batch job 539278
 
 
@@ -118,7 +118,7 @@ Submitted batch job 539278
 ====================================================
 ====================================================
 Compile with: g++ batchmaker.cpp -o batchGenerator.out
-run with: ./batchGenerator.out -batch_flags -par -parameter_flag -parameter_value
+run with: ./batchGenerator.out -batch_flags -par -parameter_flag -parameter_value -flag <flag>
 
 IN: Flag values:
 mandatory:
@@ -137,7 +137,7 @@ optional:
 OUT: sbatch script entitled AUTO_BATCH.sh
 
 Example: ./batchGenerator.out -p batch -hours 24
--cores 12 -test TEST_NAME_4 -par -WR 0.7 -par -CK 1 -par -div 2 -par -TC 4
+-cores 12 -test TEST_NAME_4 -par -WR 0.7 -par -CK 1 -par -div 2 -par -TC 4 -flag OOP_off
 
 Example output: 
 #!/bin/bash -l

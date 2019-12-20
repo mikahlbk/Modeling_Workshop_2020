@@ -77,7 +77,7 @@ class Cell: public enable_shared_from_this<Cell> {
 		double get_Damping() {return damping;}
 		//set/get life length
 		void update_Life_Length();
-		void rescale_Life_Length(int old_growth_rate);
+		void rescale_Life_Length(int old_growth_rate,bool init_phase);
 		int get_life_length() {return life_length;} 
 		void reset_Life_Length();
 		//get total node count

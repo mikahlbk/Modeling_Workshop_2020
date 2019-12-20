@@ -26,14 +26,16 @@
 
 using namespace std;
 
-//FREQUENTLY CHANGED PARAMETERS
-bool OUT_OF_PLANE_GROWTH = true;
+//FREQUENTLY CHANGED VALUES
+//Flags
+bool OUT_OF_PLANE_GROWTH = true; //./batchGenerator -flag OOP_off
+
 //EXPERIMENTAL PARAMTERS
 double OOP_PROBABILITY = 0.5; //Defaults to 0.5
-int DIV_MECHANISM = 1;
-double WUS_RAD_CONTRACTION_FACTOR = 1;
-double CK_RAD_CONTRACTION_FACTOR = 1;
-int TENSILE_CALC = 1;
+int DIV_MECHANISM = 1; //./batchGenerator -par -div <int>
+double WUS_RAD_CONTRACTION_FACTOR = 1;//./batchGenerator -par -WR <double>
+double CK_RAD_CONTRACTION_FACTOR = 1; //./batchGenerator -par -CKR <double>
+int TENSILE_CALC = 4; //./batchGenerator -par TC <int> 
 int NUM_STEPS_PER_FRAME = 2500;
 int RECENT_DIV_NUM_FRAMES = 10;
 //Must be declared in externs.h
@@ -99,6 +101,7 @@ int main(int argc, char* argv[]) {
 	//cell configuration 
 	//cout << "before cell file is read in" << endl;
 	string init_tissue = "staggered_generated.txt";
+	//string init_tissue = "one_cell.txt";
 	//cout << "Read in cell starter" << endl;	
 
 

@@ -21,6 +21,7 @@ int main(int argc, char* argv[]) {
 	char mem[100] = "";
 	vector<string> parameter_names;
 	vector<string> parameter_values;
+	vector<string> flag_names;
 	char DPM[100] = "";
 	char TC[100] = "";
 	char WUS_CF[100]= "";
@@ -50,6 +51,8 @@ int main(int argc, char* argv[]) {
 		} else if (!strcmp(argv[i], "-par")) {
 			parameter_names.push_back(argv[i+1]);
 			parameter_values.push_back(argv[i+2]);
+		} else if (!strcmp(argv[i], "-flag")) {
+			flag_names.push_back(argv[i+1]);
 		} else if (!strcmp(argv[i], "-bigdata")) { 
 			bigdata = true;
 		}
@@ -129,6 +132,9 @@ int main(int argc, char* argv[]) {
 		<< final_path << "Animate_No_Cyt_" << test;
 	for (unsigned int i = 0; i < parameter_values.size(); i++ ) { 
 		ofs << " " << parameter_names.at(i) << " " << parameter_values.at(i);
+	}
+	for (unsigned int i = 0; i < flag_names.size(); i++ ) { 
+		ofs << " " << flag_names.at(i);
 	}
 	ofs << endl;
 	ofs.close();

@@ -82,7 +82,7 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 		this->damping = REG_DAMP;
 		set_Terminal(false);
 	}
-	life_length = 0;
+	//life_length = 0;
 	//cyt nodes initialized in tissue constructor which
 	//calls the makes nodes function on each new cell
 	num_cyt_nodes = 0;
@@ -104,6 +104,7 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 		Cell_Progress = unifRand(0.5,0.75);
 	}
 	//Cell_Progress = unifRandInt(0,10);
+	rescale_Life_Length(this->growth_rate, true);
 	this->cell_center = center;
 	//this gets reupdated after singal is assigned
 	//in tissue constructor
@@ -125,6 +126,7 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 	}
 	recent_div = false;
 	recent_div_MD = 0;
+
 
 
 	//cout << "layer" << this->layer << endl;
@@ -510,16 +512,23 @@ void Cell::set_growth_rate(bool first_growth_rate) {
 
 
 	if(!first_growth_rate) { 
-		rescale_Life_Length(old_growth_rate);
+		rescale_Life_Length(old_growth_rate,false);
 	}
 
 	return;
 }
-void Cell::rescale_Life_Length(int old_growth_rate) { 
-	if (old_growth_rate == this->growth_rate) { 
-		return;
+void Cell::rescale_Life_Length(int old_growth_rate, bool init_phase) { 
+	if (!init_phase) { 
+		//Sanity check
+		if (old_growth_rate == this->growth_rate) { 
+			return;
+		} 
+		//Translate LL into CP from old life length
+		Cell_Progress = (double)life_length / (double)(30*old_growth_rate);
+	} else { 
+		//Do nothing
 	}
-	Cell_Progress = (double)life_length / (double)(30*old_growth_rate);
+	//Calculate new LL from CP
 	this->life_length = floor(Cell_Progress * 
 			static_cast<double>(30*this->growth_rate));
 	return;
@@ -1076,17 +1085,22 @@ void Cell::update_Cell_Progress(int& Ti) {
 		this->set_MD(0);
 	}
 
-	Cell_Progress = static_cast<double>(this->life_length) /
+	this->Cell_Progress = static_cast<double>(this->life_length) /
 		static_cast<double>(30*this->growth_rate);
+
+	if (Cell_Progress > 0.6) cout << "CELL PROGRESS INCREASING" << endl;
 	bool cross_section_check = 
 		this->growing_this_cycle || !OUT_OF_PLANE_GROWTH;
 	double maturity = calc_Cell_Maturity(cross_section_check);
 	double max_maturity = (cross_section_check) ? 31 : 23;
-
 	if (maturity >= num_cyt_nodes + 1 && maturity < max_maturity) {
 		//cout << "cyt node added "<< endl;
 		if (cross_section_check) this->add_Cyt_Node();
 	} 
+	
+	else { 
+	//	cout << "Not adding node. Mat: " << maturity << "C_P" << this->Cell_Progress << endl;
+	}
 	return;
 }
 
@@ -1100,6 +1114,9 @@ double Cell::calc_Cell_Maturity(bool cross_section_check) {
 	}
 	double exponent = (NONLINEAR_GROWTH) ? 2.0/3.0 : 1.0;
 	double start = this->get_Init_Num_Nodes();
+	//if (start > 25 || start < 10) { 
+	//	cout << "Init_Num_Nodes WRONG: " <<  start << endl;
+	//}
 	if (start >= finish) finish = start + 1;
 	double maturity_normalized = pow(this->Cell_Progress, exponent);
 	maturity = maturity_normalized * (finish-start) + start;
