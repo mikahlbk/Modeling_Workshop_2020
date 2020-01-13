@@ -359,7 +359,7 @@ void Cell::calc_WUS(Coord L1_AVG) {
 	//CZ ~5 cells wide
 	//layer 1
 	//from 2018 paper
-	double distance = (cell_center-(L1_AVG-Coord(0,21))).length();
+	double distance = (cell_center-(L1_AVG-Coord(0,14))).length();
 	distance = distance * WUS_RAD_CONTRACTION_FACTOR; 
 	//if(distance < 140*.15){
 	this->wuschel = 84.6*exp(-0.01573*(distance));
@@ -392,9 +392,10 @@ void Cell::set_growth_rate(bool first_growth_rate) {
 	//second distribution mean/sigma 14400/1800
 	//third distribution mean/sigma 19800/3600
 	//fourth distribution mean/sigma 39600/16200
-	
+	double mean;
+	double sigma;
 	int old_growth_rate;
-	if (!first_growth_rate) {
+	/*if (!first_growth_rate) {
 		old_growth_rate = growth_rate;
 	}
 
@@ -417,49 +418,41 @@ void Cell::set_growth_rate(bool first_growth_rate) {
 		//cout << "Count 4: " << my_tissue->return_counts(3) << endl;
 		this->growth_rate = this->my_tissue->get_next_random(4,this->my_tissue->return_counts(3));
 		this->my_tissue->set_counts(3);
-	}
+	}*/
 
 	//this->growth_rate = unifRandInt(5000,30000);
-	/*if(this->wuschel < 46){
-	  mean = 6000;
-	  this->growth_rate = GetRandomDoubleUsingNormalDistribution(mean,sigma);
+	//mt19937 gen = this->get_Tissue()->get_random_generator();
+	if(this->wuschel < 55){
+	  mean = 10800;
+	  sigma = 1800;
+	  this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
 	//this->growth_rate = unifRandInt(2000,10000);
-	cout << "growht rate:" << growth_rate << endl;
+	//cout << "growth rate:" << growth_rate << endl;
 	}
-	else if((this->wuschel >= 46)&&(this->wuschel < 50)){
-	mean = 12000;
-	this->growth_rate = GetRandomDoubleUsingNormalDistribution(mean,sigma);
+	else if(this->wuschel < 65){
+	mean = 14400;
+	sigma = 1800;
+	this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
 	//this->growth_rate = unifRandInt(10000,12510);
-	cout << "growth rate" << growth_rate << endl;
+	//cout << "growth rate" << growth_rate << endl;
 	}
-	else if((this->wuschel >=53.8) && (this->wuschel < 57)){
-	this->growth_rate = unifRandInt(12510,15012);
+	else if(this->wuschel < 75){
+	mean = 19800;
+	sigma = 3600;
+	this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
 	}
-	else if((this->wuschel >= 57)&&(this->wuschel <60.8)){
-	this->growth_rate = unifRandInt(15012,17514);
+	else{
+	mean = 39600;
+	sigma = 16200;
+	this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
 	}
-	else if((this->wuschel >=60.8) &&(this->wuschel <64)){
-	this->growth_rate = unifRandInt(17514,20016);
-	}
-	else if((this->wuschel >=64) &&(this->wuschel <67.8)){
-	this->growth_rate = unifRandInt(20016,22518);
-	}
-	else if((this->wuschel >=67.8) &&(this->wuschel <71)){
-	this->growth_rate = unifRandInt(22518,25020);
-	}
-	else if((this->wuschel >=71) &&(this->wuschel <74.8)){
-	this->growth_rate = unifRandInt(25020,27522);
-	}
-	else{//((this->wuschel >=74.8) &&(this->wuschel <78)){
-	this->growth_rate = unifRandInt(27522,30024);
 
-	}*/
 	//else if((this->wuschel >=78) && (this->wuschel <81.8)){
 	//	this->growth_rate = unifRandInt(30024,35526);
 	//}
 	//else{
 	//	this->growth_rate = unifRandInt(37530,40032);
-	//}
+		//}
 	//if((this->cytokinin >= 80)){
 
 	//this->growth_rate = growth_rate*.7;
@@ -469,7 +462,7 @@ void Cell::set_growth_rate(bool first_growth_rate) {
 	//r
 	//this->growth_rate = growth_rate*.7; 
 	//h
-	this->growth_rate = growth_rate*0.35;
+	//this->growth_rate = growth_rate*0.35;
 
 	//this->growth_rate = 5000;
 	//2018 paper	
@@ -511,11 +504,17 @@ void Cell::set_growth_rate(bool first_growth_rate) {
 	  }*/
 
 
-	if(!first_growth_rate) { 
-		rescale_Life_Length(old_growth_rate,false);
-	}
+	//if(!first_growth_rate) { 
+	//	rescale_Life_Length(old_growth_rate,false);
+	//}
 
 	return;
+
+}
+double Cell::getRandomDoubleUsingNormalDistribution(double mean, double sigma){
+	double gr;
+	gr = this->my_tissue->get_normal_number(mean,sigma);
+	return gr;
 }
 void Cell::rescale_Life_Length(int old_growth_rate, bool init_phase) { 
 	if (!init_phase) { 
@@ -1088,9 +1087,8 @@ void Cell::update_Cell_Progress(int& Ti) {
 	this->Cell_Progress = static_cast<double>(this->life_length) /
 		static_cast<double>(30*this->growth_rate);
 
-	if (Cell_Progress > 0.6) cout << "CELL PROGRESS INCREASING" << endl;
-	bool cross_section_check = 
-		this->growing_this_cycle || !OUT_OF_PLANE_GROWTH;
+	//if (Cell_Progress > 0.6) //cout << "CELL PROGRESS INCREASING" << endl;
+	bool cross_section_check = this->growing_this_cycle || !OUT_OF_PLANE_GROWTH;
 	double maturity = calc_Cell_Maturity(cross_section_check);
 	double max_maturity = (cross_section_check) ? 31 : 23;
 	if (maturity >= num_cyt_nodes + 1 && maturity < max_maturity) {
@@ -1140,29 +1138,29 @@ void Cell::division_check() {
 	//Case where the cell divides.
 	if (cross_section_check && boundary_check && cell_cycle_check) { 
 
-		cout << "dividing cell" << this->rank <<  endl;
+		//cout << "dividing cell" << this->rank <<  endl;
 		//orientation of division should be 
 		//fed to the division  function here
 		shared_ptr<Cell> new_Cell= this->division();
-		cout << "division success" << endl;
+		//cout << "division success" << endl;
 		//cout << "Parent cell prog" << Cell_Progress<< endl;
-		cout << "Sister cell prog" << new_Cell->get_Cell_Progress()<< endl;
+		//cout << "Sister cell prog" << new_Cell->get_Cell_Progress()<< endl;
 		this->my_tissue->update_Num_Cells(new_Cell);
 		//setting info about new cell
 		//cout << "Num cells" << this->my_tissue->get_num_cells() << endl;
 		new_Cell->set_Rank(this->my_tissue->get_num_cells()-1);
 		//cout << "set rank" << endl;
-		cout << "Parent rank: " << this->rank << endl;
-		cout << "Sister rank: " << new_Cell->get_Rank() << endl;
-		cout << new_Cell->get_Wall_count() << endl;
-		cout << new_Cell->get_cyt_count() << endl;
-		cout << this->get_Wall_count() << endl;
-		cout << this->get_cyt_count() << endl;
-		cout << "Parent: " << this << endl;
-		cout << "Parent progress: " << this->get_Cell_Progress() << endl;
-		cout << "New cell: " << new_Cell << endl;
-		cout << "New progress: " << new_Cell->get_Cell_Progress() << endl;
-		//for printing mother/daughter
+		//cout << "Parent rank: " << this->rank << endl;
+		//cout << "Sister rank: " << new_Cell->get_Rank() << endl;
+		//cout << new_Cell->get_Wall_count() << endl;
+		//cout << new_Cell->get_cyt_count() << endl;
+		//cout << this->get_Wall_count() << endl;
+		//cout << this->get_cyt_count() << endl;
+		//cout << "Parent: " << this << endl;
+	//	cout << "Parent progress: " << this->get_Cell_Progress() << endl;
+	//	cout << "New cell: " << new_Cell << endl;
+	//	cout << "New progress: " << new_Cell->get_Cell_Progress() << endl;
+	//	//for printing mother/daughter
 		this->recent_div = true;
 
 		//layer in division function		
@@ -2312,10 +2310,10 @@ void Cell::NAN_CATCH(int Ti) {
 #pragma omp for schedule(static,1)
 		for (unsigned int i = 0; i < cyts.size(); i++) {
 			if (isnan(cyts.at(i)->get_Location().get_X())) {
-				cout << "Cyt node " << i << " in cell " << rank << " X NaN Ti=" << Ti << endl;
+				//cout << "Cyt node " << i << " in cell " << rank << " X NaN Ti=" << Ti << endl;
 			}
 			if (isnan(cyts.at(i)->get_Location().get_Y())) {
-				cout << "Cyt node " << i << " in cell " << rank << " Y NaN Ti=" << Ti << endl;
+				//cout << "Cyt node " << i << " in cell " << rank << " Y NaN Ti=" << Ti << endl;
 			}
 		}	
 	}
@@ -2328,13 +2326,13 @@ void Cell::NAN_CATCH(int Ti) {
 #pragma omp for schedule(static,1)
 		for (unsigned int i = 0; i < walls.size(); i++) {
 			if (isnan(walls.at(i)->get_Angle())) { 
-				cout << "Wall node " << i << " in cell " << rank << " angle NaN Ti=" << Ti << endl;
+				//cout << "Wall node " << i << " in cell " << rank << " angle NaN Ti=" << Ti << endl;
 			}
 			if (isnan(walls.at(i)->get_Location().get_X())) {
-				cout << "Wall node " << i << " in cell " << rank << " X NaN Ti=" << Ti << endl;
+				//cout << "Wall node " << i << " in cell " << rank << " X NaN Ti=" << Ti << endl;
 			}
 			if (isnan(walls.at(i)->get_Location().get_Y())) {
-				cout << "Wall node " << i << " in cell " << rank << " Y NaN Ti=" << Ti << endl;
+				//cout << "Wall node " << i << " in cell " << rank << " Y NaN Ti=" << Ti << endl;
 			}
 		}	
 	}

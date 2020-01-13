@@ -13,7 +13,7 @@
 #include <ctime>
 #include <stdio.h>
 #include <memory>
-//#include <random>
+#include <random>
 #include <functional>
 #include <chrono>
 #include "phys.h"
@@ -80,10 +80,12 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}
 	int start = clock();	
-	mt19937::result_type seed = time(0);
+	std::random_device rd;
+	std::mt19937 gen(rd());
+
 	
 	//distrubution for different cell cycle lengths
-	auto normal_rand1 = bind(normal_distribution<double> (15800,2300),mt19937(seed));
+	/*auto normal_rand1 = bind(normal_distribution<double> (15800,2300),mt19937(seed));
 	auto normal_rand2 = bind(normal_distribution<double> (19400,1800),mt19937(seed));
 	auto normal_rand3 = bind(normal_distribution<double> (24800,3600), mt19937(seed));
 	auto normal_rand4 = bind(normal_distribution<double> (44600,18200), mt19937(seed));
@@ -96,7 +98,7 @@ int main(int argc, char* argv[]) {
 		dist2.push_back((int) normal_rand2());
 		dist3.push_back((int) normal_rand3());
 		dist4.push_back((int) normal_rand4());
-	}
+	}*/
 	//.txt file that tells initial
 	//cell configuration 
 	//cout << "before cell file is read in" << endl;
@@ -108,9 +110,9 @@ int main(int argc, char* argv[]) {
 	//instantiate tissue
 	//new cell and node objects
 	//are made in this call
-	Tissue growing_Tissue(init_tissue);
+	Tissue growing_Tissue(init_tissue,gen);
 	//TIssue growing_Tissue_experiment(init_tissue);
-	growing_Tissue.assign_dist_vecs(dist1, dist2, dist3, dist4);
+	//growing_Tissue.assign_dist_vecs(dist1, dist2, dist3, dist4);
 	//cout << "Finished creating Cells" << endl;
 	growing_Tissue.update_Signal();
 	//cout << "Signal" << endl;
@@ -154,7 +156,7 @@ int main(int argc, char* argv[]) {
 	int Ti = 0;
 	int terminal_timer = 0;
 	bool is_terminal = false;
-	while(terminal_timer < 3000) {
+	while(terminal_timer < 182000) {
 		//keep track of simulation runs
 		if (!is_terminal) {
 			if (Ti%1000 == 0) is_terminal = growing_Tissue.terminal_Tissue();
@@ -176,7 +178,7 @@ int main(int argc, char* argv[]) {
 		if(Ti == 10000){
 			growing_Tissue.update_Signal();
 		}
-		if(Ti % 30000 == 0){
+		if(Ti % 5000 == 0){
 			//cout << "update signal" << endl;
 			growing_Tissue.update_Signal();
 			//growing_Tissue.update_growth_direction();

@@ -30,13 +30,14 @@ class Tissue {
 		vector<shared_ptr<Cell>> cells;
 		int num_cells;
 		int num_deleted;
+		mt19937 gen;
 		vector<int> dist1;
 		vector<int> dist2;
 		vector<int> dist3;
 		vector<int> dist4;
 		vector<int> counts;	
 	public:
-		Tissue(string filename);
+		Tissue(string filename, mt19937 gen);
 		void get_Cells(vector<shared_ptr<Cell>>& cells);
 		//set/get the number of cells in the tissue
 		void update_Num_Cells(shared_ptr<Cell>& new_Cell);
@@ -53,6 +54,7 @@ class Tissue {
 		void add_Wall(int Ti);
 		void delete_Wall(int Ti);
 		void update_Adhesion();
+		double get_normal_number(double mean, double sigma); //mt19937 get_Random_Generator(){return gen;}
 		//not in use
 		void update_Linear_Bending_Springs();
 		

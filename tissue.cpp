@@ -20,9 +20,10 @@
 //.txt file that is read in
 //TEMPLATE CONSTRUCTOR
 
-Tissue::Tissue(string filename) {
+Tissue::Tissue(string filename, mt19937 gen) {
 	num_cells = 0;
 	num_deleted = 0;
+	this->gen = gen;
 	set_up_counts();
 	ifstream ifs(filename.c_str());
 
@@ -266,6 +267,11 @@ int Tissue::get_next_random(int dist, int count){
 	else{
 		return this->dist4.at(count);
 	}
+}
+double Tissue::get_normal_number(double mean, double sigma){
+	std::normal_distribution<double> distribution(mean,sigma);
+	double gr = distribution(this->gen);
+	return gr;
 }
 void Tissue::update_Signal(){
 	
