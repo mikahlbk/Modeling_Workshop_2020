@@ -81,6 +81,7 @@ int main(int argc, char* argv[]) {
 	}
 	int start = clock();	
 	mt19937::result_type seed = time(0);
+	srand(time(0));
 	
 	//distrubution for different cell cycle lengths
 	auto normal_rand1 = bind(normal_distribution<double> (15800,2300),mt19937(seed));
