@@ -13,7 +13,7 @@
 #include <memory>
 #include <bits/stdc++.h>
 #include "phys.h"
-#include "rand.h"
+//#include "rand.h"
 #include "coord.h"
 #include "node.h"
 #include "cell.h"
@@ -749,7 +749,7 @@ shared_ptr<Cell> Cell::division() {
 	this->calc_CK(L1_AVG);
 	sister->calc_CK(L1_AVG);
 
-	if(unifRand() < OOP_PROBABILITY) { 
+	if(my_tissue->unifRand() < OOP_PROBABILITY) { 
 		sister->set_Growing_This_Cycle(false);
 	} else { 
 		sister->set_Growing_This_Cycle(true);
@@ -836,7 +836,7 @@ shared_ptr<Cell> Cell::division() {
 	} while (curr_wall != sis_left_Corner);
 	cout << endl;
 
-	if (unifRand() < OOP_PROBABILITY) {  
+	if (my_tissue->unifRand() < OOP_PROBABILITY) {  
 		set_Growing_This_Cycle(false);
 	} else { 
 		set_Growing_This_Cycle(true);
