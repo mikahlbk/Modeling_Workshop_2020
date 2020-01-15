@@ -114,7 +114,7 @@ int main(int argc, char* argv[]) {
 	//TIssue growing_Tissue_experiment(init_tissue);
 	//growing_Tissue.assign_dist_vecs(dist1, dist2, dist3, dist4);
 	//cout << "Finished creating Cells" << endl;
-	growing_Tissue.update_Signal();
+	growing_Tissue.update_Signal(true);
 	//cout << "Signal" << endl;
 	//growing_Tissue.update_growth_direction();
 	//cout << "growth direction" << endl;
@@ -175,12 +175,12 @@ int main(int argc, char* argv[]) {
 			growing_Tissue.update_Neighbor_Cells();
 		}	
 
-		if(Ti == 10000){
-			growing_Tissue.update_Signal();
+		if(Ti == 10000) {
+			growing_Tissue.update_Signal(false);
 		}
-		if(Ti % 5000 == 0){
+		if(Ti % 5000 == 0) {
 			//cout << "update signal" << endl;
-			growing_Tissue.update_Signal();
+			growing_Tissue.update_Signal(false);
 			//growing_Tissue.update_growth_direction();
 		}
 		//adds one new cell wall node per cell everytime it is called

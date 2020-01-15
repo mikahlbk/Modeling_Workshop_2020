@@ -273,7 +273,7 @@ double Tissue::get_normal_number(double mean, double sigma){
 	double gr = distribution(this->gen);
 	return gr;
 }
-void Tissue::update_Signal(){
+void Tissue::update_Signal(bool initial_update){
 	
 	Coord L1_AVG = this->Compute_L1_AVG();
 	for(int i = 0; i < num_cells; i++){
@@ -282,7 +282,7 @@ void Tissue::update_Signal(){
 		//cout << "CK" << endl;
 		cells.at(i)->calc_CK(L1_AVG);
 		//cout << "GROWTH RATE" << endl;
-		cells.at(i)->set_growth_rate(false);
+		cells.at(i)->set_growth_rate(initial_update);
 		//cout<< "growth rate: " << i << " " << cells.at(i)->get_growth_rate() << endl;
 	}
 	return;

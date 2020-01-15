@@ -48,7 +48,7 @@ class Tissue {
 		void set_counts(int index);
 		void assign_dist_vecs(vector<int> dist1, vector<int>dist2, vector<int> dist3, vector<int> dist4);
 		int get_next_random(int dist, int count);
-		void update_Signal();
+		void update_Signal(bool initial_update);
 		void update_growth_direction();
 		void update_Neighbor_Cells();
 		void add_Wall(int Ti);

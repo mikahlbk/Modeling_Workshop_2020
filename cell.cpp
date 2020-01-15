@@ -65,6 +65,12 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 	this->rank = rank;
 	this->layer = layer;
 	recent_div = false;
+	//Determines if this tissue is growing out of plane initially
+	if (my_tissue->unifRand()  < OOP_PROBABILITY) { 
+		set_Growing_This_Cycle(false);
+	} else { 
+		set_Growing_This_Cycle(true);
+	}
 	//if boundary is equal to one 
 	//then the cell will have higher damping
 	//which is assigned below
@@ -90,11 +96,6 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 	//calls the make nodes function on each new cell
 	num_wall_nodes = 0;
 
-	if (my_tissue->unifRand()  < OOP_PROBABILITY) { 
-		set_Growing_This_Cycle(false);
-	} else { 
-		set_Growing_This_Cycle(true);
-	}
 	set_Init_Num_Nodes(static_cast<double>(Init_Num_Cyt_Nodes));
 
 
@@ -1094,7 +1095,8 @@ void Cell::update_Cell_Progress(int& Ti) {
 	double max_maturity = (cross_section_check) ? 31 : 23;
 	if (maturity >= num_cyt_nodes + 1 && maturity < max_maturity) {
 		//cout << "cyt node added "<< endl;
-		if (cross_section_check) this->add_Cyt_Node();
+		//if (cross_section_check) this->add_Cyt_Node();
+		this->add_Cyt_Node();
 	} 
 	
 	else { 
@@ -1198,6 +1200,7 @@ void Cell::division_check() {
 	} else if (!cross_section_check && cell_cycle_check) { 
 		//Case where the cell "divides out of plane"
 		this->reset_Cell_Progress();
+		this->reset_Life_Length();
 		if (my_tissue->unifRand() < 0.5) { 
 			set_Growing_This_Cycle(false);
 		} else { 
