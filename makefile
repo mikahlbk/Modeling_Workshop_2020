@@ -1,7 +1,7 @@
 # **************************************************
 # Variables to control Makefile operation
 CXX= -g++ -fopenmp -static-libstdc++
-CXXFLAGS= -Wall -g 
+CXXFLAGS= -Wall -g
 #*****************************************************
 # Targets needed to bring the executable up to date
 all: program 

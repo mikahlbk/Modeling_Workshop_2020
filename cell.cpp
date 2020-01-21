@@ -96,7 +96,7 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 	//calls the make nodes function on each new cell
 	num_wall_nodes = 0;
 
-	set_Init_Num_Nodes(static_cast<double>(Init_Num_Cyt_Nodes));
+	set_Init_Num_Nodes(static_cast<double>(INIT_NUM_CYT_NODES));
 
 
 	if((this->layer == 1)||(this->layer == 2)){
@@ -104,8 +104,8 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 	} else {
 		Cell_Progress = my_tissue->unifRand(0.5,0.75);
 	}
+	cout << "CELL PROGRESS CONSTRUCTOR: " << Cell_Progress << endl;
 	//Cell_Progress = my_tissue->unifRandInt(0,10);
-	rescale_Life_Length(this->growth_rate, true);
 	this->cell_center = center;
 	//this gets reupdated after singal is assigned
 	//in tissue constructor
@@ -201,7 +201,7 @@ ifs.close();
 void Cell::make_nodes(double radius){
 
 	//assemble the membrane
-	int num_Init_Wall_Nodes = Init_Wall_Nodes + 2*(Cell_Progress);
+	int num_Init_Wall_Nodes = INIT_WALL_NODES + 2*(floor(calc_Cell_Maturity(growing_this_cycle)));
 	double angle_increment = (2*pi)/num_Init_Wall_Nodes;
 
 	//make all wall nodes
@@ -508,16 +508,20 @@ void Cell::set_growth_rate(bool first_growth_rate) {
 
 	if(!first_growth_rate) { 
 		rescale_Life_Length(old_growth_rate,false);
+	} else {
+		rescale_Life_Length(this->growth_rate,true);
 	}
 
 	return;
 
 }
+
 double Cell::getRandomDoubleUsingNormalDistribution(double mean, double sigma){
 	double gr;
 	gr = this->my_tissue->get_normal_number(mean,sigma);
 	return gr;
 }
+
 void Cell::rescale_Life_Length(int old_growth_rate, bool init_phase) { 
 	if (!init_phase) { 
 		//Sanity check
@@ -525,15 +529,20 @@ void Cell::rescale_Life_Length(int old_growth_rate, bool init_phase) {
 			return;
 		} 
 		//Translate LL into CP from old life length
-		Cell_Progress = (double)life_length / (double)(30*old_growth_rate);
+		//Cell_Progress = (double)life_length / (double)(30*old_growth_rate);
+		Cell_Progress = (double)life_length / (double)(15*old_growth_rate);
+		cout << "CELL PROGRESS RLL: " << Cell_Progress << endl;
 	} else { 
 		//Do nothing
 	}
 	//Calculate new LL from CP
 	this->life_length = floor(Cell_Progress * 
-			static_cast<double>(30*this->growth_rate));
+			static_cast<double>(15*this->growth_rate));
+	//static_cast<double>(30*this->growth_rate));
+
 	return;
 }
+
 void Cell::update_growth_direction(){
 	//signaling stuff
 	if((this->layer == 1)||(this->layer ==2)) {
@@ -1087,7 +1096,8 @@ void Cell::update_Cell_Progress(int& Ti) {
 	}
 
 	this->Cell_Progress = static_cast<double>(this->life_length) /
-		static_cast<double>(30*this->growth_rate);
+		static_cast<double>(15*this->growth_rate);
+		//static_cast<double>(30*this->growth_rate);
 
 	//if (Cell_Progress > 0.6) //cout << "CELL PROGRESS INCREASING" << endl;
 	bool cross_section_check = this->growing_this_cycle || !OUT_OF_PLANE_GROWTH;
@@ -1098,7 +1108,6 @@ void Cell::update_Cell_Progress(int& Ti) {
 		//if (cross_section_check) this->add_Cyt_Node();
 		this->add_Cyt_Node();
 	} 
-	
 	else { 
 	//	cout << "Not adding node. Mat: " << maturity << "C_P" << this->Cell_Progress << endl;
 	}
@@ -1940,6 +1949,20 @@ void Cell::print_VTK_Shear_Stress(ofstream& ofs, bool cytoplasm) {
 		for(unsigned int i = 0; i < cyt_nodes.size(); i++) {
 			color = CYT_COLOR;
 			ofs << color << endl;
+		}
+	}
+	return;
+}
+
+void Cell::print_VTK_Cell_Progress(ofstream& ofs, bool cytoplasm) {
+	shared_ptr<Wall_Node> currW = left_Corner;
+	do {
+		ofs << this->Cell_Progress << endl;
+		currW = currW->get_Left_Neighbor();
+	} while(currW != left_Corner);
+	if (cytoplasm) {
+		for(unsigned int i = 0; i < cyt_nodes.size(); i++) {
+			ofs << this->Cell_Progress << endl;
 		}
 	}
 	return;

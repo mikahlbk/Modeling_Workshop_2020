@@ -672,6 +672,14 @@ void Tissue::print_VTK_File(ofstream& ofs, bool cytoplasm) {
 
 	ofs << endl;
 
+	ofs << "Scalars Cell_Progress float64" << 1 << endl;
+	ofs << "LOOKUP_TABLE default" << endl;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->print_VTK_Cell_Progress(ofs, cytoplasm);
+	}
+
+	ofs << endl;
+
 	ofs << "Scalars Neighbors float64" << 1 << endl;
 	ofs << "LOOKUP_TABLE discrete_colors" << endl;
 	for (unsigned int i = 0; i < cells.size(); i++) {

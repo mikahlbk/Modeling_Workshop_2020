@@ -111,7 +111,7 @@ int main(int argc, char* argv[]) {
 	//new cell and node objects
 	//are made in this call
 	Tissue growing_Tissue(init_tissue,gen);
-	//TIssue growing_Tissue_experiment(init_tissue);
+	//Tissue growing_Tissue_experiment(init_tissue);
 	//growing_Tissue.assign_dist_vecs(dist1, dist2, dist3, dist4);
 	//cout << "Finished creating Cells" << endl;
 	growing_Tissue.update_Signal(true);

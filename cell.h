@@ -216,6 +216,7 @@ class Cell: public enable_shared_from_this<Cell> {
 		void print_VTK_Scalars_Node(ofstream& ofs, bool cytoplasm);	
 		void print_VTK_Tensile_Stress(ofstream& ofs, bool cytoplasm);
 		void print_VTK_Shear_Stress(ofstream& ofs, bool cytoplasm);
+		void print_VTK_Cell_Progress(ofstream& ofs, bool cytoplasm);
 		void print_VTK_Neighbors(ofstream& ofs, bool cytoplasm); 
 		void print_VTK_Curved(ofstream& ofs, bool cytoplasm); 
 		void print_VTK_Corners(ofstream& ofs, bool cytoplasm);

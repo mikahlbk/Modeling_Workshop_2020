@@ -12,8 +12,8 @@
 ////=====================
 //// Simulation Constants
 const double dt = .0003;
-const int Init_Num_Cyt_Nodes = 15;
-const int Init_Wall_Nodes = 100;
+const int INIT_NUM_CYT_NODES = 15;
+const int INIT_WALL_NODES = 100;
 const double pi = acos(-1.0);
 //these are used to control equi angles
 //and bending spring constants
