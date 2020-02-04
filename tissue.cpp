@@ -23,6 +23,9 @@
 Tissue::Tissue(string filename, mt19937 gen) {
 	num_cells = 0;
 	num_deleted = 0;
+	num_divs = 0;
+	num_IP_divs = 0;
+	divplanes.clear();
 	this->gen = gen;
 	set_up_counts();
 	ifstream ifs(filename.c_str());
@@ -328,6 +331,100 @@ void Tissue::inc_Num_Deleted() {
 	return;
 }
 
+void Tissue::cell_Data_Output(ofstream& ofs, int Ti){
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->print_Cell_Data(ofs,Ti);
+	}
+	return;
+}
+
+void Tissue::tissue_Data_Output(ofstream& ofs, int Ti){
+	//Num_Divisions (IP " " All) divplanes (theta values), Width, Height(from center), Ti
+	vector<double> width_by_layer = calc_Width();
+	ofs << num_IP_divs << " " << num_divs << " ";
+	for (int i = 0; i < num_IP_divs; i++) { 
+		ofs << divplanes.at(i) << " ";
+	}
+	for (int i = 1; i <= STEM_LAYER; i++) { 
+		//Vector indexes at 0 instead of 1. 
+		ofs << width_by_layer.at(i-1) << " ";
+	}
+	ofs << calc_Height() << " ";
+	ofs << Ti << endl;
+	return;
+}
+
+vector<double> Tissue::calc_Width() {  
+	vector<double> widths;
+	double layer_min, layer_max;
+	double temp;
+	for (int i = 1; i <= STEM_LAYER; i++) { 
+		layer_min = 1000;
+		layer_max = -1000;
+		for(unsigned int j = 0; j < cells.size(); j++) {
+			if (cells.at(j)->get_Layer() == i) {
+				temp = cells.at(j)->get_Cell_Center().get_X();
+				if (temp <= layer_min)
+					layer_min = temp;
+				if (temp >= layer_max) 
+					layer_max = temp;
+			}
+		}
+		widths.push_back(layer_max - layer_min);
+	}
+	return widths; 
+}
+
+double Tissue::calc_Height() {  
+	double height = 0;
+	double sum = 0;
+	for (unsigned int i = 0; i < cells.size(); i++) { 
+		if(cells.at(i)->get_Layer() == 1) { 
+			sum += cells.at(i)->get_Cell_Center().get_X();
+		}
+	}
+	double x_avg = sum / static_cast<double>(cells.size());
+	unsigned int top_cell_index = 5000;
+	double min_dist = 500;
+	double temp;
+	for (unsigned int i = 0; i < cells.size(); i++) { 
+		if (cells.at(i)->get_Layer() == 1) { 
+			temp = cells.at(i)->get_Cell_Center().get_X() - x_avg;
+			if (abs(temp) < min_dist) { 
+				top_cell_index = i;
+				min_dist = temp;
+			}
+		}
+	}
+	for (unsigned int i = 0; i < cells.size(); i++) { 
+		if(cells.at(i)->get_Layer() == STEM_LAYER) { 
+			sum += cells.at(i)->get_Cell_Center().get_X();
+		}
+	}
+	x_avg = sum / static_cast<double>(cells.size());
+	unsigned int bottom_cell_index = 5000;
+	min_dist = 500;
+	for (unsigned int i = 0; i < cells.size(); i++) { 
+		if (cells.at(i)->get_Layer() == STEM_LAYER) { 
+			temp = cells.at(i)->get_Cell_Center().get_X() - x_avg;
+			if (abs(temp) < min_dist) { 
+				bottom_cell_index = i;
+				min_dist = temp;
+			}
+		}
+	}
+	if (top_cell_index == 5000 || bottom_cell_index == 5000) {
+		cout << "Center not found!" << endl;
+		return 0;
+	}
+	top_cell_center = cells.at(top_cell_index)->get_Cell_Center();
+	height = cells.at(top_cell_index)->get_Cell_Center().get_Y()
+		- cells.at(bottom_cell_index)->get_Cell_Center().get_Y();
+	
+	return height;
+}
+
+
 //updates adhesion springs for each cell
 void Tissue::update_Adhesion() {
 	#pragma omp parallel for schedule(static,1)
@@ -371,6 +468,28 @@ void Tissue::division_check(){
 		//cout << "dating cell" << i << endl;
 		cells.at(i)->division_check();
 	}
+	return;
+}
+
+void Tissue::update_Divs() {
+	num_divs++;
+	return;
+}
+
+void Tissue::update_IP_Divs() {
+	num_IP_divs++;
+	return;
+}
+
+void Tissue::update_Divplane_Vector(Coord plane) {
+	Coord horiz = Coord(1,0);
+	double costheta = horiz.dot(plane)/plane.length();
+	double theta = acos(min(max(costheta,-1.0), 1.0));
+	if (costheta < -1 || costheta > 1) { 
+		cout << "A div plane has invalid costheta!" << endl;
+	}
+	divplanes.push_back(theta);
+
 	return;
 }
 	

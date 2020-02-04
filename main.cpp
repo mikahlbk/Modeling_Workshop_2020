@@ -56,6 +56,9 @@ int main(int argc, char* argv[]) {
 	//this is a folder that holds data output
 	//without cytoplasm node info
 	string locations_no_cyt_folder = argv[2];
+	//Folders to hold Cell and Tissue level data
+	string cell_data_folder = argv[5];
+	string tissue_data_folder = argv[6];
 	//keep track of time
 	for (int i = 1; i < argc; i++) { 
 		if (!strcmp(argv[i], "-WR")) { 
@@ -146,6 +149,18 @@ int main(int argc, char* argv[]) {
 	ofstream ofs_loc_cyt;
 	string locations_initial = "/Locations_";
 	int out3 = 0;
+	//int digits4;
+	string Number4;
+	string cell_data;
+	ofstream cell_data_file;
+	string cell_data_initial = "/cell_data_";
+	int out4 = 0;
+	//int digits5;
+	string Number5;
+	string tissue_data;
+	ofstream tissue_data_file;
+	string tissue_data_initial = "/tissue_data_";
+	int out5 = 0;
 
 	//(No longer use this loop, instead flag for terminal.)
 	//loop for time steps
@@ -326,6 +341,22 @@ int main(int argc, char* argv[]) {
 			growing_Tissue.locations_output(ofs_loc_cyt,true);
 			ofs_loc_cyt.close();
 			out3++;
+
+			//TISSUE MUST BE RUN FIRST.  It updates
+			//various tissue characteristics for cell
+			//data to be computed:
+			//Cell Depth, (maybe more in future)
+			tissue_data = tissue_data_folder + tissue_data_initial + to_string(out5) + ".txt";
+			tissue_data_file.open(tissue_data.c_str());
+			growing_Tissue.tissue_Data_Output(tissue_data_file,Ti);
+			tissue_data_file.close();
+			out5++;
+
+			cell_data = cell_data_folder + cell_data_initial + to_string(out4) + ".txt";
+			cell_data_file.open(cell_data.c_str());
+			growing_Tissue.cell_Data_Output(cell_data_file,Ti);
+			cell_data_file.close();
+			out4++;
 		}
 		//growing_Tissue.BAD_CATCH(12,Ti);
 

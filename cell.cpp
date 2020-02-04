@@ -64,6 +64,7 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 	this->my_tissue = tiss;
 	this->rank = rank;
 	this->layer = layer;
+	set_Lineage(rank);
 	recent_div = false;
 	//Determines if this tissue is growing out of plane initially
 	if (my_tissue->unifRand()  < OOP_PROBABILITY) { 
@@ -1149,6 +1150,8 @@ void Cell::division_check() {
 
 	//Case where the cell divides.
 	if (cross_section_check && boundary_check && cell_cycle_check) { 
+		my_tissue->update_IP_Divs();
+		my_tissue->update_Divs();
 
 		//cout << "dividing cell" << this->rank <<  endl;
 		//orientation of division should be 
@@ -1206,7 +1209,8 @@ void Cell::division_check() {
 		this->clear_adhesion_vectors();
 		this->update_adhesion_springs();	
 		set_Terminal(true);
-	} else if (!cross_section_check && cell_cycle_check) { 
+	} else if (!cross_section_check && cell_cycle_check && boundary_check) { 
+		my_tissue->update_Divs();
 		//Case where the cell "divides out of plane"
 		this->reset_Cell_Progress();
 		this->reset_Life_Length();
@@ -1216,6 +1220,9 @@ void Cell::division_check() {
 			set_Growing_This_Cycle(true);
 		}
 		set_Terminal(true);
+	} else if (cell_cycle_check && !boundary_check) {
+		this->reset_Cell_Progress();
+		this->reset_Life_Length();
 	}
 	return;
 }
@@ -1736,6 +1743,72 @@ void Cell::print_locations(ofstream& ofs,bool cytoplasm) {
 	}
 	return;
 }
+void Cell::print_Cell_Data(ofstream& ofs, int Ti) {
+	//Rank Layer Area Orientation AR(Actual,prescribed) Depth Lineage M/D N_Neigh WUS CK Ti
+	
+	ofs << this->get_Rank() << " " << this->get_Layer() << " ";
+	ofs << calc_Area() << " ";
+	vector<double> orientation_stats = calc_Orientation_Stats();
+	for (unsigned int i = 0; i < 3; i++) { 
+		ofs << orientation_stats.at(i) << " ";
+	}
+	ofs << calc_Depth() << " ";
+	ofs << get_Lineage() << " ";
+	ofs << recent_div_MD << " ";
+	ofs << num_Neighbors() << " ";
+	ofs << get_WUS_concentration() << " ";
+	//get CYT concentration gets CK, 
+	//this is a typo but doesn't change anything
+	ofs << get_CYT_concentration() << " ";
+	ofs << Ti;
+	ofs << endl;
+
+}
+//Returs vector: <Longest Orientation Axis (Theta), given orientation axis (Theta), AR>
+vector<double> Cell::calc_Orientation_Stats() { 
+	//SPEEDUP POSSIBLE: Don't calc area separately, fold into Errera usage.
+	vector<double> orientation_stats;
+	vector<shared_ptr<Wall_Node>> short_axis_nodes;
+	vector<shared_ptr<Wall_Node>> long_axis_nodes;
+	Errera_div(short_axis_nodes);
+	Coord v_1 = short_axis_nodes.at(0)->get_Location();
+	Coord v_2 = short_axis_nodes.at(1)->get_Location();
+	Coord short_direction = (v_2-v_1)/((v_2-v_1).length());
+	//Note that this is ALWAYS taken to be with theta between 0 and 180 degrees.
+	Coord long_direction = short_direction.perpVector();
+	find_nodes_for_div_plane(long_direction, long_axis_nodes, 11); 
+	Coord v_3 = long_axis_nodes.at(0)->get_Location();
+	Coord v_4 = long_axis_nodes.at(1)->get_Location();
+	double long_length = (v_4 - v_3).length();
+	double short_length = (v_2 - v_1).length();
+	double aspect_ratio = long_length / short_length;
+	if (aspect_ratio <= 0) { 
+		cout << "NONPOSITIVE ASPECT RATIO!" << endl;
+	} else if (aspect_ratio < 1) { 
+		cout << "ASPECT RATIO < 1!" << endl;
+		aspect_ratio = pow(aspect_ratio,-1);
+	}
+	double theta_act = acos(long_direction.dot(Coord(1,0))); 
+	double theta_prescribed = acos( min( max( get_growth_direction().dot(Coord(1,0)),-1.0),1.0));
+	orientation_stats.push_back(theta_act);
+	orientation_stats.push_back(theta_prescribed);
+	orientation_stats.push_back(aspect_ratio);
+
+	return orientation_stats;
+}
+//Note that negative number returned means that you're higher up that the L1 Central cell.
+//This is possible if the dome is skewed or if L2 cells creep up through L1.
+double Cell::calc_Depth() { 
+	double top_Cell_Y = my_tissue->get_Top_Cell_Center().get_Y();
+	double my_Cell_Y = get_Cell_Center().get_Y();
+	return top_Cell_Y - my_Cell_Y;
+}
+
+void Cell::set_Lineage(int parent_lineage) { 
+	lineage = parent_lineage;
+	return;
+}
+
 void Cell::print_VTK_Points(ofstream& ofs, int& count, bool cytoplasm) {
 	shared_ptr<Wall_Node> curr_wall = left_Corner;
 	shared_ptr<Wall_Node> orig = curr_wall;
