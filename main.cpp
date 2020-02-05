@@ -37,6 +37,7 @@ double WUS_RAD_CONTRACTION_FACTOR = 1;//./batchGenerator -par -WR <double>
 double CK_RAD_CONTRACTION_FACTOR = 1; //./batchGenerator -par -CKR <double>
 int TENSILE_CALC = 4; //./batchGenerator -par TC <int> 
 int NUM_STEPS_PER_FRAME = 2500;
+int VTK_PER_DATA_POINT = 5;
 int RECENT_DIV_NUM_FRAMES = 10;
 //Must be declared in externs.h
 //For clarity, listed as comments in phys.h
@@ -330,7 +331,7 @@ int main(int argc, char* argv[]) {
 			Number2++;
 		}*/
 		//locations with cyt nodes
-		if(Ti % NUM_STEPS_PER_FRAME == 0){
+		if(Ti % (NUM_STEPS_PER_FRAME * VTK_PER_DATA_POINT) == 0){
 			Locations_no_cyt = locations_no_cyt_folder + locations_initial + to_string(out2) + ".txt";
 			ofs_loc_no_cyt.open(Locations_no_cyt.c_str());
 			growing_Tissue.locations_output(ofs_loc_no_cyt,false);
@@ -340,7 +341,7 @@ int main(int argc, char* argv[]) {
 			ofs_loc_cyt.open(Locations_cyt.c_str());
 			growing_Tissue.locations_output(ofs_loc_cyt,true);
 			ofs_loc_cyt.close();
-			out3++;
+			out3 += VTK_PER_DATA_POINT;
 
 			//TISSUE MUST BE RUN FIRST.  It updates
 			//various tissue characteristics for cell
@@ -350,13 +351,13 @@ int main(int argc, char* argv[]) {
 			tissue_data_file.open(tissue_data.c_str());
 			growing_Tissue.tissue_Data_Output(tissue_data_file,Ti);
 			tissue_data_file.close();
-			out5++;
+			out5 += VTK_PER_DATA_POINT;
 
 			cell_data = cell_data_folder + cell_data_initial + to_string(out4) + ".txt";
 			cell_data_file.open(cell_data.c_str());
 			growing_Tissue.cell_Data_Output(cell_data_file,Ti);
 			cell_data_file.close();
-			out4++;
+			out4 += VTK_PER_DATA_POINT;
 		}
 		//growing_Tissue.BAD_CATCH(12,Ti);
 
