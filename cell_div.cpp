@@ -473,6 +473,7 @@ shared_ptr<Cell> Cell::division() {
 	  */
 	shared_ptr<Cell> sister = make_shared<Cell> (this->my_tissue);
 	sister->set_Layer(this->layer);
+	sister->set_Lineage(this->lineage);
 	sister->set_MD(2);
 	this->set_MD(1);
 
@@ -509,7 +510,7 @@ shared_ptr<Cell> Cell::division() {
 	} else { 
 		switch (DIV_MECHANISM) { 
 			case 1: 
-				//Errera's rule
+				//Errera'r rule
 				Errera_div(nodes);
 				break;
 			case 2:
@@ -531,6 +532,7 @@ shared_ptr<Cell> Cell::division() {
 		}
 	}
 
+	my_tissue->update_Divplane_Vector(nodes.at(0)->get_Location() - nodes.at(1)->get_Location());
 	cout << "Nodes after " << nodes.size() << endl;
 	//finds node on one side of cell
 	//vector<shared_ptr<Wall_Node>> nodes;

@@ -30,6 +30,7 @@ class Cell: public enable_shared_from_this<Cell> {
 		Tissue* my_tissue;
 		int rank;
 		int layer;
+		int lineage;
 		int boundary;
 		int stem;
 		double damping;
@@ -204,6 +205,11 @@ class Cell: public enable_shared_from_this<Cell> {
 		  void print_VTK_Tensile_Stress(ofstream& ofs);
 		  void print_VTK_Shear_Stress(ofstream& ofs);*/
 		void print_locations(ofstream& ofs);
+		void print_Cell_Data(ofstream& ofs, int Ti);
+		vector<double> calc_Orientation_Stats();
+		double calc_Depth();
+		int get_Lineage() {return lineage;} 
+		void set_Lineage(int parent_lineage);
 		void print_VTK_Points(ofstream& ofs, int& count, bool cytoplasm);
 		void print_VTK_Scalars_Wall_Pressure(ofstream& ofs, bool cytoplasm);
 		void print_VTK_Scalars_Average_Pressure(ofstream& ofs, bool cytoplasm);

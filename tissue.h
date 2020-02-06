@@ -30,12 +30,18 @@ class Tissue {
 		vector<shared_ptr<Cell>> cells;
 		int num_cells;
 		int num_deleted;
+		int num_IP_divs;
+		int num_divs;
+		Coord top_cell_center;
 		mt19937 gen;
 		vector<int> dist1;
 		vector<int> dist2;
 		vector<int> dist3;
 		vector<int> dist4;
 		vector<int> counts;	
+		//vector of theta values of div planes,
+		//angle compared to (1,0) (positive horiz. unit vector).
+		vector<double> divplanes;
 	public:
 		Tissue(string filename, mt19937 gen);
 		void get_Cells(vector<shared_ptr<Cell>>& cells);
@@ -60,6 +66,9 @@ class Tissue {
 		
 		void update_Cell_Cycle(int Ti);
 		void division_check();
+		void update_Divs();
+		void update_IP_Divs();
+		void update_Divplane_Vector(Coord plane);
 		void calc_New_Forces(int Ti);
 		void update_Cell_Locations(int Ti);
 		
@@ -79,6 +88,12 @@ class Tissue {
 		void print_VTK_File(ofstream& ofs, bool cytoplasm);
 		void print_VTK_Direction_File(ofstream& ofs);	
 		void inc_Num_Deleted();
+		Coord get_Top_Cell_Center() {return top_cell_center;}
+		//Data output functions
+		void cell_Data_Output(ofstream& ofs, int Ti);
+		void tissue_Data_Output(ofstream& ofs, int Ti);
+		vector<double> calc_Width();
+		double calc_Height();
 		//Random functions
 		int unifRandInt(int a, int b);
 		double unifRand();
