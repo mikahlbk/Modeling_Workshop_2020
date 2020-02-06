@@ -1791,7 +1791,12 @@ vector<double> Cell::calc_Orientation_Stats() {
 	double theta_act = acos(long_direction.dot(Coord(1,0))); 
 	double theta_prescribed = acos( min( max( get_growth_direction().dot(Coord(1,0)),-1.0),1.0));
 	orientation_stats.push_back(theta_act);
-	orientation_stats.push_back(theta_prescribed);
+	if (this->growth_direction == Coord(0,0)) { 
+		//TO DO
+		//stuff 
+	} else { 
+		orientation_stats.push_back(theta_prescribed);
+	}
 	orientation_stats.push_back(aspect_ratio);
 
 	return orientation_stats;

@@ -253,7 +253,7 @@ int main(int argc, char* argv[]) {
 		//cout << "Finished" << endl;
 
 		// print to dataOutput and vtk files
-		if(Ti % NUM_STEPS_PER_FRAME==0) {
+		if(Ti % NUM_STEPS_PER_FRAME == 0) {
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
 				Number = "0000" + to_string(out);
@@ -331,7 +331,7 @@ int main(int argc, char* argv[]) {
 			Number2++;
 		}*/
 		//locations with cyt nodes
-		if(Ti % (NUM_STEPS_PER_FRAME * VTK_PER_DATA_POINT) == 0){
+		if(Ti % (NUM_STEPS_PER_FRAME * VTK_PER_DATA_POINT) == 0) {
 			Locations_no_cyt = locations_no_cyt_folder + locations_initial + to_string(out2) + ".txt";
 			ofs_loc_no_cyt.open(Locations_no_cyt.c_str());
 			growing_Tissue.locations_output(ofs_loc_no_cyt,false);
