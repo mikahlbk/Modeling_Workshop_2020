@@ -1793,7 +1793,7 @@ vector<double> Cell::calc_Orientation_Stats() {
 	orientation_stats.push_back(theta_act);
 	if (this->growth_direction == Coord(0,0)) { 
 		//TO DO
-		//stuff 
+		orientation_stats.push_back(-1);
 	} else { 
 		orientation_stats.push_back(theta_prescribed);
 	}
