@@ -287,6 +287,7 @@ void Tissue::update_Signal(bool initial_update){
 		//cout << "GROWTH RATE" << endl;
 		cells.at(i)->set_growth_rate(initial_update);
 		//cout<< "growth rate: " << i << " " << cells.at(i)->get_growth_rate() << endl;
+
 	}
 	return;
 

@@ -481,17 +481,6 @@ shared_ptr<Cell> Cell::division() {
 	this->Cell_Progress = 0;		
 	sister->reset_Cell_Progress();
 	sister->reset_Life_Length();
-	if((this->layer == 1)||(this->layer == 2)) {
-		sister->set_growth_direction(Coord(1,0));
-	} else if(rand()% 100 < 30) {
-		sister->set_growth_direction(Coord(0,0));
-	} else {
-		if(rand()% 100 < 36){
-			sister->set_growth_direction(Coord(1,0));
-		} else {
-			sister->set_growth_direction(Coord(0,1));
-		}
-	}
 	//this is the vector for the desired division orientation
 	Coord orientation;
 	//for layer and chemical division decision a vector called orientation
@@ -750,6 +739,24 @@ shared_ptr<Cell> Cell::division() {
 	sister->calc_WUS(L1_AVG);
 	this->calc_CK(L1_AVG);
 	sister->calc_CK(L1_AVG);
+
+	//Set sister growth rate at random
+	/*
+	if((this->layer == 1)||(this->layer == 2)) {
+		sister->set_growth_direction(Coord(1,0));
+	} else if(rand()% 100 < 30) {
+		sister->set_growth_direction(Coord(0,0));
+	} else {
+		if(rand()% 100 < 36){
+			sister->set_growth_direction(Coord(1,0));
+		} else {
+			sister->set_growth_direction(Coord(0,1));
+		}
+	}
+	*/
+	//Sister updates growth rate based on chemical distribution.
+	this->update_growth_direction();
+	sister->update_growth_direction();
 
 	if(my_tissue->unifRand() < OOP_PROBABILITY) { 
 		sister->set_Growing_This_Cycle(false);
