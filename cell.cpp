@@ -104,11 +104,12 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 	} else {
 		Cell_Progress = my_tissue->unifRand(0.5,0.75);
 	}
-	cout << "CELL PROGRESS CONSTRUCTOR: " << Cell_Progress << endl;
+	//cout << "CELL PROGRESS CONSTRUCTOR: " << Cell_Progress << endl;
 	//Cell_Progress = my_tissue->unifRandInt(0,10);
 	this->cell_center = center;
 	//this gets reupdated after singal is assigned
 	//in tissue constructor
+	/*
 	if(this->boundary == 1){
 		this->growth_direction = Coord(0,0);
 	} else if(this->stem == 1) {
@@ -125,6 +126,9 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 			this->growth_direction = Coord(0,1);
 		}
 	}
+	*/
+	growth_direction = Coord(0,0);
+	//This is a placeholder.  This is updated in main after signal calculation.
 	recent_div = false;
 	recent_div_MD = 0;
 
@@ -545,14 +549,17 @@ void Cell::rescale_Life_Length(int old_growth_rate, bool init_phase) {
 
 void Cell::update_growth_direction(){
 	//signaling stuff
-	if((this->layer == 1)||(this->layer ==2)) {
+	if(this->boundary == 1){
+		this->growth_direction = Coord(0,0);
+	} else if(this->stem == 1) {
+		this->growth_direction = Coord(0,1);
+	} else if((this->layer == 1)||(this->layer == 2)) {
 		this->growth_direction = Coord(1,0);
 	} else if(this->wuschel > this->cytokinin) {
-		this->growth_direction = Coord(0,0);
+		this->growth_direction = Coord(1,0);
 	} else {
 		this->growth_direction = Coord(0,1);
 	}
-
 	this->update_node_parameters_for_growth_direction();
 	return;
 }
