@@ -212,6 +212,48 @@ void Tissue::update_Num_Cells(shared_ptr<Cell>& new_Cell) {
 Coord Tissue::Compute_L1_AVG(){
 	Coord avg;
 	double avgx = 0;
+	//double avgy = 0;
+	double init_cell_radius = 3.75;
+	double double_cell_width = 4*init_cell_radius;
+
+	//int counter = 1;
+	for(unsigned int i = 0; i < cells.size(); i++){
+		if (cells.at(i)->get_Layer() == 1){
+			//cout << "counter: " << counter <<  endl;
+			//cout << cells.at(i)->get_Cell_Center().get_X()<< endl;
+			avgx = avgx + cells.at(i)->get_Cell_Center().get_X();
+			//cout << cells.at(i)->get_Cell_Center().get_Y() << endl;
+			//avgy = avgy + cells.at(i)->get_Cell_Center().get_Y();
+			//cout << avgx << "avg x" << endl;
+			//cout << avgy << "avg y" << endl;
+			//counter++;
+		}
+	}
+	avgx = avgx/cells.size();
+	double x_diff = 5000;
+	double temp;
+	unsigned int center_cell_index = 5000;
+	for (unsigned int i = 0; i < cells.size(); i++) { 
+		if (cells.at(i)->get_Layer() == 1) { 
+			temp = abs(cells.at(i)->get_Cell_Center().get_X() - avgx);
+			if (temp < x_diff) { 
+				x_diff = temp;
+				center_cell_index = i;
+			}	
+		}
+	}
+	Coord top_cell_center = cells.at(center_cell_index)->get_Cell_Center();
+	//cout << "really?? " << avgx << endl;
+	//cout << "really?? " << avgy << endl;
+	//avgy = avgy/cells.size();
+	//avg = Coord(avgx,avgy);
+
+	return top_cell_center - Coord(0,double_cell_width);
+}
+/* OLD L1 AVG CODE - Caused WUS to late-stage sink into tissue.
+Coord Tissue::Compute_L1_AVG(){
+	Coord avg;
+	double avgx = 0;
 	double avgy = 0;
 
 	//int counter = 1;
@@ -234,7 +276,7 @@ Coord Tissue::Compute_L1_AVG(){
 	avg = Coord(avgx,avgy);
 
 	return avg;
-}
+}*/
 //**********functions for tissue to perform on cells********//
 //updates current neighbors of each cell
 void Tissue::assign_dist_vecs(vector<int> dist1, vector<int> dist2, vector<int> dist3, vector<int> dist4){
@@ -843,8 +885,13 @@ void Tissue::print_VTK_File(ofstream& ofs, bool cytoplasm) {
 		cells.at(i)->print_VTK_OOP(ofs, cytoplasm);
 	}
 	ofs << endl;
-	//TO DO:  Add in Lineage
 
+	ofs << "Scalars Lineage float64" << 1 << endl;
+	ofs << "LOOKUP_TABLE discrete_colors" << endl;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->print_VTK_Lineage(ofs, cytoplasm);
+	}
+	ofs << endl;
 
 	return;
 }

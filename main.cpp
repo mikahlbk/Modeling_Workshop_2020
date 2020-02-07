@@ -39,6 +39,7 @@ int TENSILE_CALC = 4; //./batchGenerator -par TC <int>
 int NUM_STEPS_PER_FRAME = 2500;
 int VTK_PER_DATA_POINT = 5;
 int RECENT_DIV_NUM_FRAMES = 10;
+bool CHEMICAL_GD = true; //./batchGenerator -par -Chem_GD <1 or 0>
 //Must be declared in externs.h
 //For clarity, listed as comments in phys.h
 
@@ -74,7 +75,9 @@ int main(int argc, char* argv[]) {
 			OUT_OF_PLANE_GROWTH = false;
 		} else if (!strcmp(argv[i], "-OOP_P")) { 
 			OOP_PROBABILITY = stod(argv[i+1]);
-		} 
+		} else if (!strcmp(argv[i], "-Chem_GD")) { 
+			CHEMICAL_GD = stoi(argv[i+1]) ? true : false;
+		}
 	}
 	if (DIV_MECHANISM == 0) { 
 		cout << "DIV_MECHANISM not set.  Exiting..." << endl;

@@ -110,24 +110,6 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 	this->cell_center = center;
 	//this gets reupdated after singal is assigned
 	//in tissue constructor
-	/*
-	if(this->boundary == 1){
-		this->growth_direction = Coord(0,0);
-	} else if(this->stem == 1) {
-		this->growth_direction = Coord(0,1);
-	} else if((this->layer == 1)||(this->layer == 2)) {
-		this->growth_direction = Coord(1,0);
-	} else if(rand()% 100 < 30) {
-		this->growth_direction = Coord(0,0);
-	} else {
-		if(rand()% 100 < 36){
-			this->growth_direction = Coord(1,0);
-		}
-		else{
-			this->growth_direction = Coord(0,1);
-		}
-	}
-	*/
 	growth_direction = Coord(0,0);
 	//This is a placeholder.  This is updated in main after signal calculation.
 	recent_div = false;
@@ -550,16 +532,37 @@ void Cell::rescale_Life_Length(int old_growth_rate, bool init_phase) {
 
 void Cell::update_growth_direction(){
 	//signaling stuff
-	if(this->boundary == 1){
-		this->growth_direction = Coord(0,0);
-	} else if(this->stem == 1) {
-		this->growth_direction = Coord(0,1);
-	} else if((this->layer == 1)||(this->layer == 2)) {
-		this->growth_direction = Coord(1,0);
-	} else if(this->wuschel > this->cytokinin) {
-		this->growth_direction = Coord(1,0);
-	} else {
-		this->growth_direction = Coord(0,1);
+	//Isotropic growth if you're not growing this cycle or if
+	//you're in the boundary
+	
+	if (CHEMICAL_GD) { 
+		if(this->boundary == 1 || !growing_this_cycle){
+			this->growth_direction = Coord(0,0);
+		} else if(this->stem == 1) { //Stem grows vertically
+			this->growth_direction = Coord(0,1);
+		} else if((this->layer == 1)||(this->layer == 2)) { //Top layers grow horizontally
+			this->growth_direction = Coord(1,0);
+		} else if(this->wuschel > this->cytokinin) { //Wus > CK means horizontal
+			this->growth_direction = Coord(1,0);
+		} else { //CK > Wus means vertical
+			this->growth_direction = Coord(0,1);
+		}
+	} else {  
+		if (this->boundary == 1 || !growing_this_cycle) {
+			this->growth_direction = Coord(0,0);
+		} else if(this->stem == 1) {
+			this->growth_direction = Coord(0,1);
+		} else if((this->layer == 1)||(this->layer == 2)) {
+			this->growth_direction = Coord(1,0);
+		} else if(rand()% 100 < 30) {
+			this->growth_direction = Coord(0,0);
+		} else {
+			if(rand()% 100 < 36) {
+				this->growth_direction = Coord(1,0);
+			} else {
+				this->growth_direction = Coord(0,1);
+			}
+		}
 	}
 	this->update_node_parameters_for_growth_direction();
 	return;
@@ -1732,7 +1735,7 @@ void Cell::print_locations(ofstream& ofs,bool cytoplasm) {
 
 
 		Coord loc = curr_wall->get_Location();
-		ofs << this->get_Rank()<<' '<< loc.get_X() << ' ' << loc.get_Y() << " 1 " << num_neighbors <<  endl;
+		ofs << this->get_Rank() << ' ' << this->get_Layer() << ' ' << loc.get_X() << ' ' << loc.get_Y() << " 1 " << num_neighbors <<  endl;
 		//Add 
 		//cout<< "maybe cant do left neighbor" << endl;
 		curr_wall = curr_wall->get_Left_Neighbor();
@@ -1745,7 +1748,7 @@ void Cell::print_locations(ofstream& ofs,bool cytoplasm) {
 	if(cytoplasm) {
 		for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 			Coord loc = cyt_nodes.at(i)->get_Location();
-			ofs << this->get_Rank() << ' '<< loc.get_X() << ' ' << loc.get_Y() << " 0 " << num_neighbors << endl;
+			ofs << this->get_Rank() << ' '<< this->get_Layer() << ' ' << loc.get_X() << ' ' << loc.get_Y() << " 0 " << num_neighbors << endl;
 		}
 	}
 	return;
@@ -1799,7 +1802,6 @@ vector<double> Cell::calc_Orientation_Stats() {
 	double theta_prescribed = acos( min( max( get_growth_direction().dot(Coord(1,0)),-1.0),1.0));
 	orientation_stats.push_back(theta_act);
 	if (this->growth_direction == Coord(0,0)) { 
-		//TO DO
 		orientation_stats.push_back(-1);
 	} else { 
 		orientation_stats.push_back(theta_prescribed);
@@ -2166,6 +2168,21 @@ void Cell::print_VTK_OOP(ofstream& ofs, bool cytoplasm) {
 	shared_ptr<Wall_Node> currW = left_Corner;
 	bool OOP_Flag = this->growing_this_cycle;
 	unsigned int color = (OOP_Flag) ? 1 : 0;
+	do {
+		ofs << color << endl;
+		currW = currW->get_Left_Neighbor();
+	} while(currW != left_Corner);
+	if (cytoplasm) {
+		for(unsigned int i = 0; i < cyt_nodes.size(); i++) {
+			ofs << color << endl;
+		}
+	}
+	return;
+}
+
+void Cell::print_VTK_Lineage(ofstream& ofs, bool cytoplasm) {
+	shared_ptr<Wall_Node> currW = left_Corner;
+	unsigned int color = this->lineage;
 	do {
 		ofs << color << endl;
 		currW = currW->get_Left_Neighbor();

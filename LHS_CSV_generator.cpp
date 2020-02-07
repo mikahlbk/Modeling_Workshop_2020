@@ -75,8 +75,8 @@ int main(int argc, char* argv[]) {
 			cin >> temp_str;
 			maxvals.push_back(temp_str);
 		} else { 
-			minvals.push_back("false");
-			maxvals.push_back("true");
+			minvals.push_back("0");
+			maxvals.push_back("1");
 		}
 
 	}
@@ -201,9 +201,9 @@ int main(int argc, char* argv[]) {
 								X_sample_bins[j][i],
 								num_samples);
 					if (bool_roll <= 1) { 
-						X_k.push_back("false");
+						X_k.push_back("0");
 					} else { 
-						X_k.push_back("true");
+						X_k.push_back("1");
 					}
 					//Y
 					bool_roll = stratifiedBins(
@@ -212,9 +212,9 @@ int main(int argc, char* argv[]) {
 								Y_sample_bins[j][i],
 								num_samples);
 					if (bool_roll <= 1) { 
-						Y_k.push_back("false");
+						Y_k.push_back("0");
 					} else { 
-						Y_k.push_back("true");
+						Y_k.push_back("1");
 					}
 					break;
 				default:

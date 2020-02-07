@@ -10,6 +10,7 @@ extern double WUS_RAD_CONTRACTION_FACTOR;
 extern double OOP_PROBABILITY;
 extern double CK_RAD_CONTRACTION_FACTOR;
 extern bool OUT_OF_PLANE_GROWTH;
+extern bool CHEMICAL_GD;
 extern int TENSILE_CALC;
 extern int NUM_STEPS_PER_FRAME;
 extern int RECENT_DIV_NUM_FRAMES;
