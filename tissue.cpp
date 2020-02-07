@@ -26,6 +26,7 @@ Tissue::Tissue(string filename, mt19937 gen) {
 	num_divs = 0;
 	num_IP_divs = 0;
 	divplanes.clear();
+	divplanes_layers.clear();
 	this->gen = gen;
 	set_up_counts();
 	ifstream ifs(filename.c_str());
@@ -388,6 +389,9 @@ void Tissue::tissue_Data_Output(ofstream& ofs, int Ti){
 	for (int i = 0; i < num_IP_divs; i++) { 
 		ofs << divplanes.at(i) << " ";
 	}
+	for (int i = 0; i < num_IP_divs; i++) { 
+		ofs << divplanes_layers.at(i) << " ";
+	}
 	for (int i = 1; i <= STEM_LAYER; i++) { 
 		//Vector indexes at 0 instead of 1. 
 		ofs << width_by_layer.at(i-1) << " ";
@@ -524,7 +528,7 @@ void Tissue::update_IP_Divs() {
 	return;
 }
 
-void Tissue::update_Divplane_Vector(Coord plane) {
+void Tissue::update_Divplane_Vector(Coord plane, int layer_of_div) {
 	Coord horiz = Coord(1,0);
 	double costheta = horiz.dot(plane)/plane.length();
 	double theta = acos(min(max(costheta,-1.0), 1.0));
@@ -532,6 +536,7 @@ void Tissue::update_Divplane_Vector(Coord plane) {
 		cout << "A div plane has invalid costheta!" << endl;
 	}
 	divplanes.push_back(theta);
+	divplanes_layers.push_back(layer_of_div);
 
 	return;
 }

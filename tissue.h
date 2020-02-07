@@ -42,6 +42,7 @@ class Tissue {
 		//vector of theta values of div planes,
 		//angle compared to (1,0) (positive horiz. unit vector).
 		vector<double> divplanes;
+		vector<int> divplanes_layers;
 	public:
 		Tissue(string filename, mt19937 gen);
 		void get_Cells(vector<shared_ptr<Cell>>& cells);
@@ -68,7 +69,7 @@ class Tissue {
 		void division_check();
 		void update_Divs();
 		void update_IP_Divs();
-		void update_Divplane_Vector(Coord plane);
+		void update_Divplane_Vector(Coord plane,int layer_of_div);
 		void calc_New_Forces(int Ti);
 		void update_Cell_Locations(int Ti);
 		

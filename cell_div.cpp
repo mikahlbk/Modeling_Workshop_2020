@@ -533,7 +533,8 @@ shared_ptr<Cell> Cell::division() {
 		}
 	}
 
-	my_tissue->update_Divplane_Vector(nodes.at(0)->get_Location() - nodes.at(1)->get_Location());
+	my_tissue->update_Divplane_Vector(nodes.at(0)->get_Location() - nodes.at(1)->get_Location(), 
+			this->layer);
 	cout << "Nodes after " << nodes.size() << endl;
 	//finds node on one side of cell
 	//vector<shared_ptr<Wall_Node>> nodes;
