@@ -1326,7 +1326,7 @@ void Cell::delete_Wall_Node_Check(int Ti){
 				delete_Specific_Wall_Node(Ti, currW);
 				repeat = true;
 				this->get_Tissue()->inc_Num_Deleted();
-			} else if ( currW->calc_Tensile_Stress() < 0) { 
+			} else if ( currW->get_Updated_Tensile_Stress() < 0) { 
 				//This accidentally worked nicely for 0.3.
 				delete_Specific_Wall_Node(Ti, currW);
 				repeat = true;
@@ -1724,18 +1724,18 @@ void Cell::print_direction_vec(ofstream& ofs){
 	return;
 }
 //LOCATIONS
-void Cell::print_locations(ofstream& ofs,bool cytoplasm) {
+void Cell::print_locations(ofstream& ofs,bool cytoplasm, int Ti) {
 	///ofs << this->get_Rank() << ' ' << this->get_Layer();
 	shared_ptr<Wall_Node> curr_wall = left_Corner;
 	shared_ptr<Wall_Node> orig = curr_wall;
-	int num_neighbors = num_Neighbors();
+	//int num_neighbors = num_Neighbors();
 	//	cout << "knows left corner" << endl;
 
 	do {
 
 
 		Coord loc = curr_wall->get_Location();
-		ofs << this->get_Rank() << ' ' << this->get_Layer() << ' ' << loc.get_X() << ' ' << loc.get_Y() << " 1 " << num_neighbors <<  endl;
+		ofs << this->get_Rank() << ' ' << this->get_Layer() << ' ' << loc.get_X() << ' ' << loc.get_Y() << ' ' << curr_wall->get_Tensile_Stress() << ' ' << Ti << endl;
 		//Add 
 		//cout<< "maybe cant do left neighbor" << endl;
 		curr_wall = curr_wall->get_Left_Neighbor();
@@ -1745,12 +1745,14 @@ void Cell::print_locations(ofstream& ofs,bool cytoplasm) {
 
 	//cout << "walls worked" << endl;
 
+	/*
 	if(cytoplasm) {
 		for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 			Coord loc = cyt_nodes.at(i)->get_Location();
 			ofs << this->get_Rank() << ' '<< this->get_Layer() << ' ' << loc.get_X() << ' ' << loc.get_Y() << " 0 " << num_neighbors << endl;
 		}
 	}
+	*/
 	return;
 }
 void Cell::print_Cell_Data(ofstream& ofs, int Ti) {
@@ -2009,7 +2011,8 @@ void Cell::print_VTK_Tensile_Stress(ofstream& ofs, bool cytoplasm) {
 	shared_ptr<Wall_Node> currW = left_Corner;
 	double color;
 	do {
-		color = currW->calc_Tensile_Stress();
+		if(cytoplasm) currW->calc_Tensile_Stress();
+		color = currW->get_Tensile_Stress();
 		ofs << color << endl;
 		//cout << "Tensile" << color << endl;
 		//cout << "Angle" << currW->get_Angle() << endl;s

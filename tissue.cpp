@@ -573,9 +573,9 @@ bool Tissue::terminal_Tissue() {
 	return true;
 }
 
-void Tissue::locations_output(ofstream& ofs, bool cytoplasm){
+void Tissue::locations_output(ofstream& ofs, bool cytoplasm,int Ti){
 	for (unsigned int i = 0; i < cells.size(); i++) {
-		cells.at(i)->print_locations(ofs,cytoplasm);
+		cells.at(i)->print_locations(ofs,cytoplasm,Ti);
 	}
 return;
 }

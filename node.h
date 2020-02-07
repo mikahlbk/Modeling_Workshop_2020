@@ -76,6 +76,7 @@ class Wall_Node: public Node, public enable_shared_from_this<Wall_Node> {
 		double cross_Prod;
 		int added;
 		Coord cyt_force;
+		double tensile_stress;
 		
 		//variables used for adhesion
 		vector<shared_ptr<Wall_Node>> adhesion_vector;
@@ -146,7 +147,9 @@ class Wall_Node: public Node, public enable_shared_from_this<Wall_Node> {
 		~Wall_Node();
 
 		//Stress Calculations
-		double calc_Tensile_Stress();
+		void calc_Tensile_Stress();
+		double get_Tensile_Stress() { return tensile_stress; }
+		double get_Updated_Tensile_Stress();
 		double calc_Shear_Stress();
 
 };

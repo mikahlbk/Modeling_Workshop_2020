@@ -79,7 +79,7 @@ class Tissue {
 		void plot_direction_vec(ofstream& ofs);
 		void print_Data_Output(ofstream& ofs);
 
-		void locations_output(ofstream& ofs,bool cytoplasm);
+		void locations_output(ofstream& ofs,bool cytoplasm, int Ti);
 		//int update_VTK_Indices();
 		//void print_VTK_File(ofstream& ofs);
 

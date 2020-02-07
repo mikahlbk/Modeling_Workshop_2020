@@ -334,7 +334,8 @@ void Cell::find_nodes_for_div_plane_mechanical(vector<shared_ptr<Wall_Node>>& no
 	shared_ptr<Wall_Node> second_node;
 
 	for(unsigned int i = 0; i < mother_walls.size();i++) {	
-		curr_stress = mother_walls.at(i)-> calc_Tensile_Stress();
+		mother_walls.at(i)->calc_Tensile_Stress();
+		curr_stress = mother_walls.at(i)->get_Tensile_Stress();
 		pairs.push_back(make_pair(curr_stress,mother_walls.at(i)));
 	}
 

@@ -712,7 +712,7 @@ Coord Wall_Node::linear_Equation_ADH(shared_ptr<Wall_Node>& wall) {
 }*/
 
 //NEW tensile stress
-double Wall_Node::calc_Tensile_Stress() { 
+void Wall_Node::calc_Tensile_Stress() { 
 	//Variable to store tensile stress is TS
 	Coord outward = calc_Outward_Vector();
 	Coord tangent = outward.perpVector();
@@ -752,7 +752,13 @@ double Wall_Node::calc_Tensile_Stress() {
 	Coord adh_force = calc_Morse_DC(1);
 	if (TENSILE_CALC == 1 || TENSILE_CALC == 3) 
 		TS += abs(adh_force.dot(tangent));
-	return TS;
+	tensile_stress = TS;
+	return;
+}
+
+double Wall_Node::get_Updated_Tensile_Stress() { 
+	calc_Tensile_Stress();
+	return tensile_stress;
 }
 
 //Tensile Stress V3

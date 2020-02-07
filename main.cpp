@@ -278,6 +278,9 @@ int main(int argc, char* argv[]) {
 
 			ofs_anim.open(Filename.c_str());
 			//true is in reference to printing cytoplasm
+			//THIS MUST BE RUN FIRST: Tensile stress is calculated
+			//once for this, and NOT before the next to prevent
+			//double-calculating.
 			growing_Tissue.print_VTK_File(ofs_anim,true);
 			ofs_anim.close();	
 
@@ -340,12 +343,12 @@ int main(int argc, char* argv[]) {
 		if(Ti % (NUM_STEPS_PER_FRAME * VTK_PER_DATA_POINT) == 0) {
 			Locations_no_cyt = locations_no_cyt_folder + locations_initial + to_string(out2) + ".txt";
 			ofs_loc_no_cyt.open(Locations_no_cyt.c_str());
-			growing_Tissue.locations_output(ofs_loc_no_cyt,false);
+			growing_Tissue.locations_output(ofs_loc_no_cyt,false,Ti);
 			ofs_loc_no_cyt.close();
 			out2++;
 			Locations_cyt = locations_cyt_folder + locations_initial + to_string(out3) + ".txt";
 			ofs_loc_cyt.open(Locations_cyt.c_str());
-			growing_Tissue.locations_output(ofs_loc_cyt,true);
+			growing_Tissue.locations_output(ofs_loc_cyt,true,Ti);
 			ofs_loc_cyt.close();
 			out3 += VTK_PER_DATA_POINT;
 
