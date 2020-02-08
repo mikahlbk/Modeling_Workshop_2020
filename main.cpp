@@ -80,10 +80,10 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	if (DIV_MECHANISM == 0) { 
-		cout << "DIV_MECHANISM not set.  Exiting..." << endl;
+		//cout << "DIV_MECHANISM not set.  Exiting..." << endl;
 		exit(1);
 	} else if (DIV_MECHANISM > 3 || DIV_MECHANISM < 1) { 
-		cout << "DIV_MECHANISM Input failed. Exiting..." << endl;
+		//cout << "DIV_MECHANISM Input failed. Exiting..." << endl;
 		exit(1);
 	}
 	int start = clock();	
@@ -238,18 +238,18 @@ int main(int argc, char* argv[]) {
 		}
 		//adds internal node according to 
 		//individual cell growth rate
-		if(Ti >= 10000){
+		if (Ti >= 10000){
 			//cout << "cell cycle" << endl;
 			growing_Tissue.update_Cell_Cycle(Ti);
 		}
 		//will divide cell if time
-		cout << "divide necessary cells" << endl;
-		if(Ti >= 10000){
+		//cout << "divide necessary cells" << endl;
+		if (Ti >= 10000) {
 			growing_Tissue.division_check();
 		}
 
 		//Calculate new forces on cells and nodes
-		cout << "forces" << endl;
+		//cout << "forces" << endl;
 		growing_Tissue.calc_New_Forces(Ti);
 
 		//Update node positions
@@ -379,7 +379,7 @@ int main(int argc, char* argv[]) {
 
 	int stop = clock();
 
-	cout << "Time: " << (stop - start) / double(CLOCKS_PER_SEC) * 1000 << endl;
+	//cout << "Time: " << (stop - start) / double(CLOCKS_PER_SEC) * 1000 << endl;
 
 	return 0;
 

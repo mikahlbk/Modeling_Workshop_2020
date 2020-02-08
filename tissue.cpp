@@ -32,7 +32,7 @@ Tissue::Tissue(string filename, mt19937 gen) {
 	ifstream ifs(filename.c_str());
 
 	if(!ifs) {
-		cout << filename << " is not available" << endl;
+		//cout << filename << " is not available" << endl;
 		return;
 	}
 
@@ -102,7 +102,7 @@ Tissue::Tissue(string filename) {
 	ifstream ifs(filename.c_str());
 
 	if(!ifs) {
-		cout << filename << " is not available" << endl;
+		//cout << filename << " is not available" << endl;
 		return;
 	}
 	shared_ptr<Wall_Node> lc;
@@ -203,8 +203,8 @@ void Tissue::update_Num_Cells(shared_ptr<Cell>& new_Cell) {
 	num_cells++;
 	//cout << num_cells << endl;
 	if (isnan(new_Cell->get_Left_Corner()->get_Location().get_X())) { 
-		cout << "Passed a bad cell!" << endl;
-		cout << "Num_Cells:" << endl;
+		//cout << "Passed a bad cell!" << endl;
+		//cout << "Num_Cells:" << endl;
 		exit(1);
 	}
 	cells.push_back(new_Cell);
@@ -371,7 +371,7 @@ void Tissue::delete_Wall(int Ti) {
 
 void Tissue::inc_Num_Deleted() { 
 	this->num_deleted++; 
-	cout << "Total Number of Wall Nodes Deleted: " << this->num_deleted << endl;
+	//cout << "Total Number of Wall Nodes Deleted: " << this->num_deleted << endl;
 	return;
 }
 
@@ -461,7 +461,7 @@ double Tissue::calc_Height() {
 		}
 	}
 	if (top_cell_index == 5000 || bottom_cell_index == 5000) {
-		cout << "Center not found!" << endl;
+		//cout << "Center not found!" << endl;
 		return 0;
 	}
 	top_cell_center = cells.at(top_cell_index)->get_Cell_Center();
@@ -533,7 +533,7 @@ void Tissue::update_Divplane_Vector(Coord plane, int layer_of_div) {
 	double costheta = horiz.dot(plane)/plane.length();
 	double theta = acos(min(max(costheta,-1.0), 1.0));
 	if (costheta < -1 || costheta > 1) { 
-		cout << "A div plane has invalid costheta!" << endl;
+		//cout << "A div plane has invalid costheta!" << endl;
 	}
 	divplanes.push_back(theta);
 	divplanes_layers.push_back(layer_of_div);
@@ -912,10 +912,10 @@ void Tissue::NAN_CATCH(int Ti) {
 void Tissue::BAD_CATCH(int call, int Ti) { 
 	unsigned int ui_num_cells = num_cells;
 	if (cells.size() != ui_num_cells) { 
-		cout << "BAD_CATCH num_cells disparity triggered at location " << call << " at Time = " << Ti << endl;
+		//cout << "BAD_CATCH num_cells disparity triggered at location " << call << " at Time = " << Ti << endl;
 	}
 	if (num_cells < 0) { 
-		cout << "Negative num_cells at location " << call << " at Time = " << Ti << endl;
+		//cout << "Negative num_cells at location " << call << " at Time = " << Ti << endl;
 	}
 	double x_curr, y_curr, x_neigh, y_neigh;
 
@@ -926,11 +926,11 @@ void Tissue::BAD_CATCH(int call, int Ti) {
 		y_neigh = cells.at(i)->get_Left_Corner()->get_Right_Neighbor()->get_Location().get_Y();
 
 		if (isnan(x_curr) || isnan(y_curr)) { 
-			cout << "Bad X-coord in left corner of cell " << cells.at(i)->get_Rank() << " call " << call << " Time = " << Ti;
+			//cout << "Bad X-coord in left corner of cell " << cells.at(i)->get_Rank() << " call " << call << " Time = " << Ti;
 		}
 		if (x_curr == x_neigh && y_curr == y_neigh) { 
-			cout << "Overlapping nodes in cell " << cells.at(i)->get_Rank() << " call " << call << " Time = " << Ti;
-			cout << "x_curr = " << x_curr << endl << "; y_curr = " << y_curr << endl;
+			//cout << "Overlapping nodes in cell " << cells.at(i)->get_Rank() << " call " << call << " Time = " << Ti;
+			//cout << "x_curr = " << x_curr << endl << "; y_curr = " << y_curr << endl;
 		}
 	}
 	return;

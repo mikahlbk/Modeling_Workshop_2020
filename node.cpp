@@ -31,11 +31,11 @@ void Node::update_Location(int Ti) {
 	//cout << "damping" << damping << endl;
 	//cout << "dt" << dt << endl;
 	if (isnan(new_force.get_X())|| isnan(new_force.get_Y())) { 
-		cout << "New force is NaN in update_Location() Ti=" << Ti << endl;
+		//cout << "New force is NaN in update_Location() Ti=" << Ti << endl;
 	} else if (isnan(dt)) { 
-		cout << "dt is NaN in update_Location() Ti=" << Ti << endl;
+		//cout << "dt is NaN in update_Location() Ti=" << Ti << endl;
 	} else if (isnan(damping)) { 
-		cout << "damping is NaN in update_Location() Ti=" << Ti << endl;
+		//cout << "damping is NaN in update_Location() Ti=" << Ti << endl;
 	}
 	my_loc += new_force*dt*damping;
 	//cout << "updated" << my_loc << endl;
@@ -81,7 +81,7 @@ Coord Cyt_Node::calc_Morse_II(int Ti) {
 	//calc force for II
 	Coord Fii; //initialized to zero
 	if (my_cell==NULL) {
-		cout << "Error: Trying to access NULL Pointer. Aborting!" << endl;
+		//cout << "Error: Trying to access NULL Pointer. Aborting!" << endl;
 		exit(1);
 	}
 
@@ -108,7 +108,7 @@ Coord Cyt_Node::calc_Morse_MI(shared_ptr<Wall_Node> orig, int Ti) {
 	//calc force for MI
 	Coord Fmi;
 	if (my_cell==NULL) {
-		cout << "Error: Trying to access NULL Pointer. Aborting!" << endl;
+		//cout << "Error: Trying to access NULL Pointer. Aborting!" << endl;
 		exit(1);
 	}
 
@@ -130,7 +130,7 @@ Coord Cyt_Node::calc_Morse_MI(shared_ptr<Wall_Node> orig, int Ti) {
 
 Coord Cyt_Node::morse_Equation(shared_ptr<Cyt_Node> cyt, int Ti) {
 	if (cyt == NULL) {
-		cout << "ERROR: Trying to access NULL pointer. Aborting!" << endl;
+		//cout << "ERROR: Trying to access NULL pointer. Aborting!" << endl;
 		exit(1);
 	}
 
@@ -146,7 +146,7 @@ Coord Cyt_Node::morse_Equation(shared_ptr<Cyt_Node> cyt, int Ti) {
 
 Coord Cyt_Node::morse_Equation(shared_ptr<Wall_Node> wall, int Ti) {
 	if (wall == NULL) {
-		cout << "ERROR: Trying to access NULL pointer. Aborting!" << endl;
+		//cout << "ERROR: Trying to access NULL pointer. Aborting!" << endl;
 		exit(1);
 	} 
 
@@ -238,10 +238,10 @@ void Wall_Node::update_Angle() {
 	
 	if (left_len * right_len == 0) { 
 		my_angle = 0;
-		cout << "Overlapping nodes in update_Angle()!" << endl;
+		//cout << "Overlapping nodes in update_Angle()!" << endl;
 		return;
 	} else if (isnan(left_len * right_len) ) { 
-		cout << "NaN in update_Angle() Cell " << get_My_Cell()->get_Rank() << endl;
+		//cout << "NaN in update_Angle() Cell " << get_My_Cell()->get_Rank() << endl;
 		//exit(1);
 
 	}
@@ -298,7 +298,7 @@ void Wall_Node::make_connection(vector<shared_ptr<Wall_Node>> neighbor_walls) {
 		neighbor_node_loc = neighbor_walls.at(i)->get_Location();
 		curr_distance = (this_ptr_loc - neighbor_node_loc).length();
 		if(curr_distance < ADHThresh){
-			//	cout << "within adh thresh" << endl;
+			//	//cout << "within adh thresh" << endl;
 			if(this_ptr_adh_vec.size() < NUMBER_ADH_CONNECTIONS){
 				this_ptr->adh_push_back(neighbor_walls.at(i));
 				this_ptr_adh_vec = this_ptr->get_adh_vec();
@@ -368,7 +368,7 @@ void Wall_Node::remove_from_adh_vecs(){
 			}
 		}
 		if (self_index == 100) 
-			cout << "I am not here!" << endl;
+			//cout << "I am not here!" << endl;
 		adhesion_vector.at(i)->clear_adhesion_vec();
 		for (unsigned int j = 0; j < neighbor_connections.size(); j++) {
 			if(j != self_index){
@@ -434,10 +434,10 @@ Coord Wall_Node::calc_Morse_SC(int Ti) {
 Coord Wall_Node::calc_Linear() {
 	Coord F_lin;
 
-	//	cout << "calc left" << endl;
+	//	//cout << "calc left" << endl;
 	F_lin += linear_Equation(left);
 
-	//	cout << "calc right" << endl;
+	//	//cout << "calc right" << endl;
 	F_lin += linear_Equation(right);
 	return F_lin;
 }
@@ -503,7 +503,7 @@ Coord Wall_Node::neighbor_nodes(shared_ptr<Cell> neighbor, int Ti) {
 // Mathematical force calculations
 Coord Wall_Node::morse_Equation(shared_ptr<Cyt_Node> cyt, int Ti) {
 	if (cyt == NULL) {
-		cout << "ERROR: Trying to access NULL pointer. Aborting!" << endl;
+		//cout << "ERROR: Trying to access NULL pointer. Aborting!" << endl;
 		exit(1);
 	}
 
@@ -522,7 +522,7 @@ Coord Wall_Node::morse_Equation(shared_ptr<Cyt_Node> cyt, int Ti) {
 //REAL FUNCTION
 Coord Wall_Node::morse_Equation(shared_ptr<Wall_Node> wall, int Ti) {
 	if (wall == NULL) {
-		cout << "ERROR: Trying to access NULL pointer. Aborting!" << endl;
+		//cout << "ERROR: Trying to access NULL pointer. Aborting!" << endl;
 		exit(1);
 	}
 
@@ -631,7 +631,7 @@ return F_right;
 }
 Coord Wall_Node::linear_Equation(shared_ptr<Wall_Node> wall) {
 	if (wall == NULL) {
-		cout << "ERROR: Trying to access NULL pointer. Aborting!" << endl;
+		//cout << "ERROR: Trying to access NULL pointer. Aborting!" << endl;
 		exit(1);
 	}
 
@@ -640,7 +640,7 @@ Coord Wall_Node::linear_Equation(shared_ptr<Wall_Node> wall) {
 	Coord diff_vect = wall->get_Location() - my_loc;
 	double diff_len = diff_vect.length();
 	if (diff_len == 0) { 
-		cout << "Overlapping walls in linear_Equation(), returning 0." << endl;
+		//cout << "Overlapping walls in linear_Equation(), returning 0." << endl;
 		return Coord(0,0);
 	}
 
@@ -651,20 +651,20 @@ Coord Wall_Node::linear_Equation(shared_ptr<Wall_Node> wall) {
 
 Coord Wall_Node::linear_Equation_ADH(shared_ptr<Wall_Node>& wall) {
 	if (wall == NULL) {
-		cout << "Error: Trying to access NULL pointer Aborting!" << endl;
+		//cout << "Error: Trying to access NULL pointer Aborting!" << endl;
 		exit(1);
 	};
 	Coord F_lin;
-	//	cout << "compute diff vec" << endl;
+	//	//cout << "compute diff vec" << endl;
 	Coord wall_loc = wall->get_Location();
-	//	cout << "wall loc"  << endl;
+	//	//cout << "wall loc"  << endl;
 	Coord loc = my_loc;
-	//	cout << "my loc " << endl;
+	//	//cout << "my loc " << endl;
 	Coord diff_vect = wall_loc - loc;
-	//	cout << "coord diff is : " << diff_vect << endl;
+	//	//cout << "coord diff is : " << diff_vect << endl;
 	double diff_len = diff_vect.length();
 	if (diff_len == 0) { 
-		cout << "Overlapping walls in linear_Equation_ADH(), returning 0." << endl;
+		//cout << "Overlapping walls in linear_Equation_ADH(), returning 0." << endl;
 		return Coord(0,0);
 	}
 	if(this->get_My_Cell()->get_recent_div()){
@@ -913,7 +913,7 @@ Coord Wall_Node::calc_Outward_Vector() {
 		Coord center_to_node = here - cell_center;
 		if (center_to_node.dot(left_outward) <= 0) left_outward = Coord(0,0) - left_outward;
 		if (center_to_node.dot(right_outward) <= 0) right_outward = Coord(0,0) - right_outward;
-		cout << "CIRCLE FAILED" << endl;
+		//cout << "CIRCLE FAILED" << endl;
 	} else if (outward.dot(here-get_My_Cell()->get_Cell_Center()) < 0) { 
 		outward = Coord((-1)*outward.get_X(), (-1)*outward.get_Y());
 	}

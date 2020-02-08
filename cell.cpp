@@ -518,7 +518,7 @@ void Cell::rescale_Life_Length(int old_growth_rate, bool init_phase) {
 		//Translate LL into CP from old life length
 		//Cell_Progress = (double)life_length / (double)(30*old_growth_rate);
 		Cell_Progress = (double)life_length / (double)(15*old_growth_rate);
-		cout << "CELL PROGRESS RLL: " << Cell_Progress << endl;
+	//cout << "CELL PROGRESS RLL: " << Cell_Progress << endl;
 	} else { 
 		//Do nothing
 	}
@@ -659,7 +659,7 @@ double Cell::compute_k_bend(shared_ptr<Wall_Node> current) {
 	if((growth_direction == Coord(0,1)) || (growth_direction == Coord(1,0))||(growth_direction == Coord(0,0))) {
 		//fine
 	} else {
-		cout << "No growth direction assigned" << endl;
+	//cout << "No growth direction assigned" << endl;
 		exit(1);
 	}
 	double k_bend = 0;
@@ -702,7 +702,7 @@ double Cell::compute_k_bend_div(shared_ptr<Wall_Node> current) {
 	if((growth_direction == Coord(0,1)) || (growth_direction == Coord(1,0)) || (growth_direction == Coord(0,0))) {
 		//fine
 	} else {
-		cout << "No growth direction assigned" << endl;
+	//cout << "No growth direction assigned" << endl;
 		exit(1);
 	}
 	double k_bend = 0;
@@ -903,7 +903,7 @@ void Cell::update_Neighbor_Cells() {
 			//cout << "made pointer to current neighbor" << endl;
 			if (curr != sp_this) {
 				curr_Cent = curr->get_Cell_Center();
-				//				cout << "got center" << endl;
+				//			//cout << "got center" << endl;
 				// Check if cell centers are close enough together
 				distance = sp_this->cell_center - curr_Cent;
 				//cout << "Distance = " << distance << endl;
@@ -1120,7 +1120,7 @@ void Cell::update_Cell_Progress(int& Ti) {
 		this->add_Cyt_Node();
 	} 
 	else { 
-	//	cout << "Not adding node. Mat: " << maturity << "C_P" << this->Cell_Progress << endl;
+	////cout << "Not adding node. Mat: " << maturity << "C_P" << this->Cell_Progress << endl;
 	}
 	return;
 }
@@ -1136,7 +1136,7 @@ double Cell::calc_Cell_Maturity(bool cross_section_check) {
 	double exponent = (NONLINEAR_GROWTH) ? 2.0/3.0 : 1.0;
 	double start = this->get_Init_Num_Nodes();
 	//if (start > 25 || start < 10) { 
-	//	cout << "Init_Num_Nodes WRONG: " <<  start << endl;
+	////cout << "Init_Num_Nodes WRONG: " <<  start << endl;
 	//}
 	if (start >= finish) finish = start + 1;
 	double maturity_normalized = pow(this->Cell_Progress, exponent);
@@ -1182,9 +1182,9 @@ void Cell::division_check() {
 		//cout << this->get_Wall_count() << endl;
 		//cout << this->get_cyt_count() << endl;
 		//cout << "Parent: " << this << endl;
-	//	cout << "Parent progress: " << this->get_Cell_Progress() << endl;
-	//	cout << "New cell: " << new_Cell << endl;
-	//	cout << "New progress: " << new_Cell->get_Cell_Progress() << endl;
+	////cout << "Parent progress: " << this->get_Cell_Progress() << endl;
+	////cout << "New cell: " << new_Cell << endl;
+	////cout << "New progress: " << new_Cell->get_Cell_Progress() << endl;
 	//	//for printing mother/daughter
 		this->recent_div = true;
 
@@ -1729,7 +1729,7 @@ void Cell::print_locations(ofstream& ofs,bool cytoplasm, int Ti) {
 	shared_ptr<Wall_Node> curr_wall = left_Corner;
 	shared_ptr<Wall_Node> orig = curr_wall;
 	//int num_neighbors = num_Neighbors();
-	//	cout << "knows left corner" << endl;
+	////cout << "knows left corner" << endl;
 
 	do {
 
@@ -1795,9 +1795,9 @@ vector<double> Cell::calc_Orientation_Stats() {
 	double short_length = (v_2 - v_1).length();
 	double aspect_ratio = long_length / short_length;
 	if (aspect_ratio <= 0) { 
-		cout << "NONPOSITIVE ASPECT RATIO!" << endl;
+	//cout << "NONPOSITIVE ASPECT RATIO!" << endl;
 	} else if (aspect_ratio < 1) { 
-		cout << "ASPECT RATIO < 1!" << endl;
+	//cout << "ASPECT RATIO < 1!" << endl;
 		aspect_ratio = pow(aspect_ratio,-1);
 	}
 	double theta_act = acos(long_direction.dot(Coord(1,0))); 
@@ -1828,7 +1828,7 @@ void Cell::set_Lineage(int parent_lineage) {
 void Cell::print_VTK_Points(ofstream& ofs, int& count, bool cytoplasm) {
 	shared_ptr<Wall_Node> curr_wall = left_Corner;
 	shared_ptr<Wall_Node> orig = curr_wall;
-	//	cout << "knows left corner" << endl;
+	////cout << "knows left corner" << endl;
 	do {
 		Coord loc = curr_wall->get_Location();
 		ofs << loc.get_X() << ' ' << loc.get_Y() << ' ' << 0 << endl;
@@ -1855,7 +1855,7 @@ void Cell::print_VTK_Points(ofstream& ofs, int& count, bool cytoplasm) {
 
   shared_ptr<Wall_Node> curr_wall = left_Corner;
   shared_ptr<Wall_Node> orig = curr_wall;
-//	cout << "knows left corner" << endl;
+////cout << "knows left corner" << endl;
 do {
 Coord loc = curr_wall->get_Location();
 ofs << loc.get_X() << ' ' << loc.get_Y() << ' ' << 0 << endl;
