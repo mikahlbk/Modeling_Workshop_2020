@@ -40,6 +40,7 @@ int NUM_STEPS_PER_FRAME = 2500;
 int VTK_PER_DATA_POINT = 5;
 int RECENT_DIV_NUM_FRAMES = 10;
 bool CHEMICAL_GD = true; //./batchGenerator -par -Chem_GD <1 or 0>
+bool HILL_PROB = false;  //Needs to be set to true for hill to apply.
 //Must be declared in externs.h
 //For clarity, listed as comments in phys.h
 
@@ -379,7 +380,7 @@ int main(int argc, char* argv[]) {
 
 	int stop = clock();
 
-	//cout << "Time: " << (stop - start) / double(CLOCKS_PER_SEC) * 1000 << endl;
+	cout << "Time: " << (stop - start) / double(CLOCKS_PER_SEC) * 1000 << endl;
 
 	return 0;
 

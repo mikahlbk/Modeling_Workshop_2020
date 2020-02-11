@@ -723,6 +723,8 @@ void Wall_Node::calc_Tensile_Stress() {
 	//Displacements of left and right node form this node)
 	Coord Delta_R = RNeighbor->get_Location() - me->get_Location();
 	Coord Delta_L = LNeighbor->get_Location() - me->get_Location();
+	TS_left = 0;
+	TS_right = 0;
 	if (TENSILE_CALC == 1 || TENSILE_CALC == 2) {
 		TS_left = me->get_k_lin() * (Delta_R.projectOnto(tangent).length() - me->get_membr_len());
 		TS_right = me->get_k_lin() * (Delta_L.projectOnto(tangent).length() - me->get_membr_len());

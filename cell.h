@@ -121,6 +121,7 @@ class Cell: public enable_shared_from_this<Cell> {
 		void update_node_parameters_for_growth_direction();
 		void set_growth_direction(Coord gd);
 		Coord get_growth_direction(){return growth_direction;}
+		double hill_Prob();
 		//get current neighbor cells		
 		void get_Neighbor_Cells(vector<shared_ptr<Cell>>& cells);
 		//set/get growing_this_cycle

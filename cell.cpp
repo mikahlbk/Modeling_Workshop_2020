@@ -536,16 +536,30 @@ void Cell::update_growth_direction(){
 	//you're in the boundary
 	
 	if (CHEMICAL_GD) { 
-		if(this->boundary == 1 || !growing_this_cycle){
-			this->growth_direction = Coord(0,0);
-		} else if(this->stem == 1) { //Stem grows vertically
-			this->growth_direction = Coord(0,1);
-		} else if((this->layer == 1)||(this->layer == 2)) { //Top layers grow horizontally
-			this->growth_direction = Coord(1,0);
-		} else if(this->wuschel > this->cytokinin) { //Wus > CK means horizontal
-			this->growth_direction = Coord(1,0);
-		} else { //CK > Wus means vertical
-			this->growth_direction = Coord(0,1);
+		if (HILL_PROB) { 
+			if(this->boundary == 1 || !growing_this_cycle){
+				this->growth_direction = Coord(0,0);
+			} else if(this->stem == 1) { //Stem grows vertically
+				this->growth_direction = Coord(0,1);
+			} else if(my_tissue->unifRand() <  hill_Prob()) {
+				//hill_prob is probability of periclinal
+				//growth as a function of CK/WUS
+				this->growth_direction = Coord(0,1);
+			} else { 
+				this->growth_direction = Coord(1,0);
+			}
+		} else { 
+			if(this->boundary == 1 || !growing_this_cycle){
+				this->growth_direction = Coord(0,0);
+			} else if(this->stem == 1) { //Stem grows vertically
+				this->growth_direction = Coord(0,1);
+			} else if((this->layer == 1)||(this->layer == 2)) { //Top layers grow horizontally
+				this->growth_direction = Coord(1,0);
+			} else if(this->wuschel > this->cytokinin) { //Wus > CK means horizontal
+				this->growth_direction = Coord(1,0);
+			} else { //CK > Wus means vertical
+				this->growth_direction = Coord(0,1);
+			}
 		}
 	} else {  
 		if (this->boundary == 1 || !growing_this_cycle) {
@@ -566,6 +580,20 @@ void Cell::update_growth_direction(){
 	}
 	this->update_node_parameters_for_growth_direction();
 	return;
+}
+double Cell::hill_Prob() {
+	double lambda = this->cytokinin / this->wuschel;
+	if (HILL_K <= 0) { 
+		cout << "Hill K must be >= 0!" << endl;
+		return 0;
+	}
+	if (lambda <= HILL_K) { 
+		double lambdaN = pow(lambda,HILL_N);
+		double HILL_KN = pow(HILL_K,HILL_N);
+		return lambdaN / (HILL_KN + lambdaN);
+	} else { 
+		return 1.0 / (1.0 + pow(HILL_K / lambda, HILL_N));
+	}
 }
 void Cell::update_node_parameters_for_growth_direction(){
 	vector<shared_ptr<Wall_Node>> walls;

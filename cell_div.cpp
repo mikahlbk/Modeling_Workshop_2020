@@ -516,10 +516,20 @@ shared_ptr<Cell> Cell::division() {
 				break;
 			case 2:
 				//Chemically Driven Division
-				if((this->get_CYT_concentration() > this->get_WUS_concentration())){
-					orientation = Coord(1,0);
+				if(HILL_PROB) { 
+					if(my_tissue->unifRand() < hill_Prob()) {
+						//hill_Prob is the probability of periclinal.
+						orientation = Coord(1,0); //periclinal division
+					} else {
+						//Else anticlinal.
+						orientation = Coord(0,1);
+					}
 				} else { 
-					orientation = Coord(0,1);
+					if((this->get_CYT_concentration() > this->get_WUS_concentration())){
+						orientation = Coord(1,0);
+					} else { 
+						orientation = Coord(0,1);
+					}
 				}
 				find_nodes_for_div_plane(orientation,nodes,11);
 				break;
