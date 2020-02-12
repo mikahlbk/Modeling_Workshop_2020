@@ -15,7 +15,7 @@ const double dt = .0003;
 const int INIT_NUM_CYT_NODES = 15;
 const int INIT_WALL_NODES = 100;
 const double pi = acos(-1.0);
-const double HILL_K = 1;
+const double HILL_K = 1.29672531651;
 const int HILL_N = 1;
 //these are used to control equi angles
 //and bending spring constants
