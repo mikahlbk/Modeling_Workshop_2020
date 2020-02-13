@@ -33,6 +33,7 @@ bool OUT_OF_PLANE_GROWTH = true; //./batchGenerator -flag OOP_off
 //EXPERIMENTAL PARAMTERS
 double OOP_PROBABILITY = 0.5; //Defaults to 0.5
 int DIV_MECHANISM = 1; //./batchGenerator -par -div <int>
+//1 - Errera, 2 - Chem, 3 - Mech
 double WUS_RAD_CONTRACTION_FACTOR = 1;//./batchGenerator -par -WR <double>
 double CK_RAD_CONTRACTION_FACTOR = 1; //./batchGenerator -par -CKR <double>
 int TENSILE_CALC = 4; //./batchGenerator -par TC <int> 
@@ -41,6 +42,7 @@ int VTK_PER_DATA_POINT = 5;
 int RECENT_DIV_NUM_FRAMES = 10;
 bool CHEMICAL_GD = true; //./batchGenerator -par -Chem_GD <1 or 0>
 bool HILL_PROB = false;  //Needs to be set to true for hill to apply.
+int HILL_N = 1;
 //Must be declared in externs.h
 //For clarity, listed as comments in phys.h
 
@@ -78,6 +80,9 @@ int main(int argc, char* argv[]) {
 			OOP_PROBABILITY = stod(argv[i+1]);
 		} else if (!strcmp(argv[i], "-Chem_GD")) { 
 			CHEMICAL_GD = stoi(argv[i+1]) ? true : false;
+		} else if (!strcmp(argv[i], "-HILL_N")) {
+			HILL_N = stoi(argv[i+1]);
+			HILL_PROB = true;
 		}
 	}
 	if (DIV_MECHANISM == 0) { 

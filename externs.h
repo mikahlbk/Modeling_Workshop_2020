@@ -16,4 +16,5 @@ extern int NUM_STEPS_PER_FRAME;
 extern int RECENT_DIV_NUM_FRAMES;
 extern int VTK_PER_DATA_POINT;
 extern bool HILL_PROB;
+extern int HILL_N;
 #endif
