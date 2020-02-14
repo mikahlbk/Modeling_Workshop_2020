@@ -192,7 +192,7 @@ Wall_Node::Wall_Node(Coord loc,shared_ptr<Cell> my_cell, shared_ptr<Wall_Node> l
 	//functions that use this must set
 	this->left = left;
 	this->right = right;
-	this-> my_cell = my_cell;
+	this->my_cell = my_cell;
 	//equilibrium length
 	update_Angle();
 	//klinear
@@ -353,25 +353,23 @@ void Wall_Node::update_adh_vec(shared_ptr<Wall_Node> node) {
 }
 //removes the current node from adhesion vector of
 //cell wall nodes from neighboring cells 
-void Wall_Node::remove_from_adh_vecs(){
+void Wall_Node::remove_from_adh_vecs() {
 	unsigned int self_index;
 	shared_ptr<Wall_Node> me = shared_from_this();
 	vector<shared_ptr<Wall_Node>> neighbor_connections;
-	for (unsigned int i = 0; i < adhesion_vector.size(); i++){
+	for (unsigned int i = 0; i < adhesion_vector.size(); i++) {
 		self_index = 100;
 		neighbor_connections.clear();
 		neighbor_connections = adhesion_vector.at(i)->get_adh_vec();
 		for (unsigned int j = 0; j < neighbor_connections.size(); j++) { 
-
 			if (neighbor_connections.at(j) == me) { 
 				self_index = j;				
 			}
 		}
-		if (self_index == 100) 
-			//cout << "I am not here!" << endl;
+		if (self_index == 100) cout << "I am not here!" << endl;
 		adhesion_vector.at(i)->clear_adhesion_vec();
 		for (unsigned int j = 0; j < neighbor_connections.size(); j++) {
-			if(j != self_index){
+			if (neighbor_connections.at(j) != me) {
 				adhesion_vector.at(i)->adh_push_back(neighbor_connections.at(j));
 			}
 		}

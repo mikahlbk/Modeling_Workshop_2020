@@ -1430,7 +1430,7 @@ void Cell::delete_Wall_Node(int Ti) {
 	//vector<Cell*>neighbors;
 
 	this->find_Smallest_Length(small);
-	if(small !=NULL) {
+	if(small != NULL) {
 		//cout << "delete initiated" << endl;
 		left = small->get_Left_Neighbor();
 		right = small->get_Right_Neighbor();
@@ -1471,11 +1471,12 @@ void Cell::delete_Wall_Node(int Ti) {
 	}
 	return;
 }
+
 void Cell::delete_Specific_Wall_Node(int Ti, shared_ptr<Wall_Node> wall) {
 	shared_ptr<Wall_Node> left = NULL;
 	shared_ptr<Wall_Node> right = NULL;
 	//vector<Cell*>neighbors;
-	if(wall !=NULL) {
+	if(wall != NULL) {
 		//cout << "delete initiated" << endl;
 		left = wall->get_Left_Neighbor();
 		right = wall->get_Right_Neighbor();
@@ -1506,7 +1507,7 @@ void Cell::delete_Specific_Wall_Node(int Ti, shared_ptr<Wall_Node> wall) {
 			next = curr->get_Left_Neighbor();
 			num_wall_nodes++;
 			curr = next;
-		}while(next != orig);
+		} while(next != orig);
 		//cout << "update equi angles" << endl;
 
 		update_Wall_Equi_Angles();
@@ -1718,10 +1719,10 @@ void Cell::print_VTK_Adh(ofstream& ofs) {
 	vector<shared_ptr<Wall_Node>> nodes;
 
 	do {
-		for(unsigned int i = 0; i < curr_wall->get_adh_vec().size(); i++){
+		for(unsigned int i = 0; i < curr_wall->get_adh_vec().size(); i++) {
 			nodes = curr_wall->get_adh_vec();
 			neighbor = nodes.at(i);
-			if(neighbor != NULL) {
+			if (neighbor != NULL) {
 				my_id = curr_wall->get_VTK_Id();
 				nei_id = neighbor->get_VTK_Id();
 				ofs << 2 << ' ' << my_id << ' ' << nei_id << endl;
