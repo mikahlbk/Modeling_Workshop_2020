@@ -182,7 +182,7 @@ int main(int argc, char* argv[]) {
 	int Ti = 0;
 	int terminal_timer = 0;
 	bool is_terminal = false;
-	while(terminal_timer < 182000) {
+	while (terminal_timer < 182000) {
 		//keep track of simulation runs
 		if (!is_terminal) {
 			if (Ti%1000 == 0) is_terminal = growing_Tissue.terminal_Tissue();
