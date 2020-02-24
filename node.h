@@ -123,6 +123,7 @@ class Wall_Node: public Node, public enable_shared_from_this<Wall_Node> {
 		void one_to_one_check();
 		vector<shared_ptr<Wall_Node>>get_adh_vec(){return adhesion_vector;}
       		void clear_adhesion_vec();
+		void erase_Adhesion_Element(unsigned int j);
 		void remove_from_adh_vecs();	
 		void adh_push_back(shared_ptr<Wall_Node> neighbor_node);
 		void update_adh_vec(shared_ptr<Wall_Node> node);

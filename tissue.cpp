@@ -9,6 +9,7 @@
 #include <string>
 #include <iomanip>
 #include <memory>
+#include <algorithm>
 #include <random>
 #include "phys.h"
 #include "coord.h"
@@ -210,16 +211,15 @@ void Tissue::update_Num_Cells(shared_ptr<Cell>& new_Cell) {
 	cells.push_back(new_Cell);
 	return;
 }
-Coord Tissue::Compute_L1_AVG(){
+//Old - Picks center cell to be L1 Average.  Causes
+//flickering if two compete. Now computes weighted average
+//between two closest to center.
+/*
+Coord Tissue::Compute_L1_AVG() {
 	Coord avg;
 	double avgx = 0;
-	//double avgy = 0;
-	double init_cell_radius = 3.75;
-	double double_cell_width = 4*init_cell_radius;
-
-	//int counter = 1;
-	for(unsigned int i = 0; i < cells.size(); i++){
-		if (cells.at(i)->get_Layer() == 1){
+	for(unsigned int i = 0; i < cells.size(); i++) {
+		if (cells.at(i)->get_Layer() == 1) {
 			//cout << "counter: " << counter <<  endl;
 			//cout << cells.at(i)->get_Cell_Center().get_X()<< endl;
 			avgx = avgx + cells.at(i)->get_Cell_Center().get_X();
@@ -249,7 +249,49 @@ Coord Tissue::Compute_L1_AVG(){
 	//avgy = avgy/cells.size();
 	//avg = Coord(avgx,avgy);
 
-	return top_cell_center - Coord(0,double_cell_width);
+	return top_cell_center;
+}*/
+Coord Tissue::Compute_L1_AVG() {
+	Coord avg;
+	vector<pair<double,unsigned int>> dist_coord_pairs;
+	double avgx = 0;
+	for(unsigned int i = 0; i < cells.size(); i++) {
+		if (cells.at(i)->get_Layer() == 1) {
+			//cout << "counter: " << counter <<  endl;
+			//cout << cells.at(i)->get_Cell_Center().get_X()<< endl;
+			avgx = avgx + cells.at(i)->get_Cell_Center().get_X();
+			//cout << cells.at(i)->get_Cell_Center().get_Y() << endl;
+			//avgy = avgy + cells.at(i)->get_Cell_Center().get_Y();
+			//cout << avgx << "avg x" << endl;
+			//cout << avgy << "avg y" << endl;
+			//counter++;
+		}
+	}
+	avgx = avgx/cells.size();
+	for (unsigned int i = 0; i < cells.size(); i++) { 
+		if (cells.at(i)->get_Layer() == 1) { 
+			dist_coord_pairs.push_back(make_pair(
+					abs(cells.at(i)->get_Cell_Center().get_X() - avgx),
+					i
+					));
+		}
+	}
+	sort(dist_coord_pairs.begin(),dist_coord_pairs.end());
+	//C1 and C2  are the two closest cell centers to the avg. 
+	Coord C1 = cells.at(dist_coord_pairs.at(0).second)->get_Cell_Center();
+	Coord C2 = cells.at(dist_coord_pairs.at(1).second)->get_Cell_Center();
+	if (dist_coord_pairs.at(0).first == 0) {
+		return C1;
+	}
+
+	double lambda = (avgx - C1.get_X()) / ((C2 - C1).get_X());
+	if (lambda > 1 || lambda < 0) {
+		cout << "Invalid lambda in Compute_L1_AVG!" << endl;
+		return C2;
+	}
+	Coord top_cell_center = (C1*(1-lambda)) + (C2*lambda);
+
+	return top_cell_center;
 }
 /* OLD L1 AVG CODE - Caused WUS to late-stage sink into tissue.
 Coord Tissue::Compute_L1_AVG(){
@@ -474,12 +516,12 @@ double Tissue::calc_Height() {
 
 //updates adhesion springs for each cell
 void Tissue::update_Adhesion() {
-	#pragma omp parallel for schedule(static,1)
-	for(unsigned int i = 0;i<cells.size();i++) {
+	//#pragma omp parallel for schedule(static,1)
+	for (unsigned int i = 0; i < cells.size(); i++) {
 		//cout << "Updating adhesion for cell" << i <<  endl;
 		cells.at(i)->clear_adhesion_vectors();
 	}
-	for(unsigned int i = 0;i<cells.size();i++) {
+	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->update_adhesion_springs();
 		cells.at(i)->update_Adh_Neighbors();
 	}
@@ -813,7 +855,7 @@ void Tissue::print_VTK_File(ofstream& ofs, bool cytoplasm) {
 		//cells.at(i)->print_VTK_Scalars_Average_Pressure(ofs);
 	}
 	ofs << endl;
-	*/
+	
 
 	ofs << "Scalars wall_pressure float64" << 1 << endl;
 	ofs << "LOOKUP_TABLE default" << endl;
@@ -821,7 +863,7 @@ void Tissue::print_VTK_File(ofstream& ofs, bool cytoplasm) {
 		cells.at(i)->print_VTK_Scalars_Node(ofs, cytoplasm);
 	}
 
-	ofs << endl;
+	ofs << endl;*/
 	
 	ofs << "Scalars tensile_stress float64" << 1 << endl;
 	ofs << "LOOKUP_TABLE default" << endl;
@@ -831,13 +873,14 @@ void Tissue::print_VTK_File(ofstream& ofs, bool cytoplasm) {
 
 	ofs << endl;
 
+	/*
 	ofs << "Scalars shear_stress float64" << 1 << endl;
 	ofs << "LOOKUP_TABLE default" << endl;
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->print_VTK_Shear_Stress(ofs, cytoplasm);
 	}
 
-	ofs << endl;
+	ofs << endl;*/
 
 	ofs << "Scalars Cell_Progress float64" << 1 << endl;
 	ofs << "LOOKUP_TABLE default" << endl;
@@ -862,6 +905,7 @@ void Tissue::print_VTK_File(ofstream& ofs, bool cytoplasm) {
 	}
 	ofs << endl;
 
+	/*
 	ofs << "Scalars Curved_Walls float64" << 1 << endl;
 	ofs << "LOOKUP_TABLE discrete_colors" << endl;
 	for (unsigned int i = 0; i < cells.size(); i++) {
@@ -876,12 +920,13 @@ void Tissue::print_VTK_File(ofstream& ofs, bool cytoplasm) {
 	}
 	ofs << endl;
 
+	
 	ofs << "Scalars Mother_Daughter float64" << 1 << endl;
 	ofs << "LOOKUP_TABLE discrete_colors" << endl;
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->print_VTK_MD(ofs, cytoplasm);
 	}
-	ofs << endl;
+	ofs << endl;*/
 
 
 	ofs << "Scalars OOP_Flag float64" << 1 << endl;

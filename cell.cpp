@@ -209,7 +209,7 @@ void Cell::make_nodes(double radius){
 	//this will be the "starter" node
 	this->left_Corner = orig;
 	//make successive nodes
-	for(int i = 0; i<num_Init_Wall_Nodes-1; i++) {
+	for (int i = 0; i < num_Init_Wall_Nodes - 1; i++) {
 		curr_theta = curr_theta + angle_increment;
 		curr_X = cell_center.get_X() + radius*cos(curr_theta);
 		curr_Y = cell_center.get_Y() + radius*sin(curr_theta);
@@ -537,10 +537,10 @@ void Cell::update_growth_direction(){
 	
 	if (CHEMICAL_GD) { 
 		if (HILL_PROB) { 
-			if(this->boundary == 1 || !growing_this_cycle){
-				this->growth_direction = Coord(0,0);
-			} else if(this->stem == 1) { //Stem grows vertically
+			if(this->stem == 1) { //Stem grows vertically
 				this->growth_direction = Coord(0,1);
+			} else if(this->boundary == 1 || !growing_this_cycle) {
+				this->growth_direction = Coord(0,0);
 			} else if(my_tissue->unifRand() <  hill_Prob()) {
 				//hill_prob is probability of periclinal
 				//growth as a function of CK/WUS
@@ -1028,14 +1028,14 @@ void Cell::update_adhesion_springs() {
 	//get all neighboring cells to this cell
 	vector<shared_ptr<Cell>> neighbors;
 	this->get_Neighbor_Cells(neighbors);
-	for(unsigned int i = 0; i < neighbors.size(); i++) {
+	for (unsigned int i = 0; i < neighbors.size(); i++) {
 		neighbors.at(i)->get_Wall_Nodes_Vec(nghbr_walls_current);
 		nghbr_walls_total.insert(nghbr_walls_total.end(), nghbr_walls_current.begin(), nghbr_walls_current.end());
 	}	
 	//	#pragma omp parallel 
 	//	{
 	//		#pragma omp for schedule(static,1)
-	for(unsigned int i=0; i < current_cell_walls.size(); i++) {
+	for (unsigned int i = 0; i < current_cell_walls.size(); i++) {
 		//counter++;
 		//cout<< counter << endl;
 		//cout << "Wall node" << current_cell_walls.at(i) << endl;
@@ -1047,7 +1047,7 @@ void Cell::update_adhesion_springs() {
 	//look at adh vector, is a nodes is in the curr cell wall
 	//nodes adh vector make sure the current cell wall node
 	//is in that nodes adh vector
-	for(unsigned int i = 0; i < current_cell_walls.size(); i++) {
+	for (unsigned int i = 0; i < current_cell_walls.size(); i++) {
 		current_cell_walls.at(i)->one_to_one_check();
 	}
 	return;
@@ -1196,8 +1196,8 @@ void Cell::division_check() {
 		//fed to the division  function here
 		shared_ptr<Cell> new_Cell= this->division();
 		//cout << "division success" << endl;
-		//cout << "Parent cell prog" << Cell_Progress<< endl;
-		//cout << "Sister cell prog" << new_Cell->get_Cell_Progress()<< endl;
+		//cout << "Parent cell prog" << Cell_Progress << endl;
+		//cout << "Sister cell prog" << new_Cell->get_Cell_Progress() << endl;
 		this->my_tissue->update_Num_Cells(new_Cell);
 		//setting info about new cell
 		//cout << "Num cells" << this->my_tissue->get_num_cells() << endl;
@@ -1240,8 +1240,6 @@ void Cell::division_check() {
 			adh_cells.at(i)->update_Neighbor_Cells(neighbor_curr_adhesions,new_Cell);
 			adh_cells.at(i)->clear_adhesion_vectors();
 			adh_cells.at(i)->update_adhesion_springs();
-
-
 		}
 		this->update_Neighbor_Cells(this->adh_neighbors,new_Cell);
 		this->clear_adhesion_vectors();
@@ -1321,7 +1319,7 @@ void Cell::set_Init_Num_Nodes(double inn) {
 void Cell::add_Wall_Node_Check(int Ti) {
 	//cout << "adding a wall node" << endl;
 	//#pragma omp for schedule(static,1)
-	if(this->life_length < 1000){
+	if(this->Cell_Progress < 0.05){
 		//do nothing
 	} else {
 		shared_ptr<Wall_Node> lc;
@@ -1351,16 +1349,21 @@ void Cell::delete_Wall_Node_Check(int Ti){
 			currAngle = angle_wall_pairs.at(i).first;
 			currW = angle_wall_pairs.at(i).second;
 			if (currAngle < pi / 2 || currAngle > 3*pi / 2) {  
+				currW->one_to_one_check();
 				delete_Specific_Wall_Node(Ti, currW);
 				repeat = true;
 				this->get_Tissue()->inc_Num_Deleted();
 			} else if ( currW->get_Updated_Tensile_Stress() < 0) { 
 				//This accidentally worked nicely for 0.3.
+				currW->one_to_one_check();
 				delete_Specific_Wall_Node(Ti, currW);
 				repeat = true;
 				this->get_Tissue()->inc_Num_Deleted();
 			}
-			if (repeat) break;
+			if (repeat) {
+
+				break;
+			}
 		}
 	} while (repeat);
 	return;
@@ -1424,12 +1427,19 @@ void Cell::add_Wall_Node(int Ti) {
 	return;
 }
 void Cell::delete_Wall_Node(int Ti) {
-	shared_ptr<Wall_Node> left = NULL;
-	shared_ptr<Wall_Node> right = NULL;
+	//shared_ptr<Wall_Node> left = NULL;
+	//shared_ptr<Wall_Node> right = NULL;
 	shared_ptr<Wall_Node> small = NULL;
 	//vector<Cell*>neighbors;
 
 	this->find_Smallest_Length(small);
+
+	if (small) small->one_to_one_check();
+
+	this->delete_Specific_Wall_Node(Ti,small);
+
+	if (small) small->one_to_one_check();
+	/*
 	if(small != NULL) {
 		//cout << "delete initiated" << endl;
 		left = small->get_Left_Neighbor();
@@ -1468,7 +1478,7 @@ void Cell::delete_Wall_Node(int Ti) {
 
 		//cout << "update angles" << endl;
 		update_Wall_Angles();
-	}
+	}*/
 	return;
 }
 
@@ -2154,7 +2164,7 @@ void Cell::print_VTK_Curved(ofstream& ofs, bool cytoplasm) {
 	return;
 }
 
-void Cell::print_VTK_Corners(ofstream& ofs, bool cytoplasm) {
+/*void Cell::print_VTK_Corners(ofstream& ofs, bool cytoplasm) {
 	shared_ptr<Wall_Node> currW = left_Corner;
 	//cout << "Corner Print - Mark 1" << endl;
 	vector<shared_ptr<Wall_Node>> corners = get_Corner_Nodes();
@@ -2179,7 +2189,7 @@ void Cell::print_VTK_Corners(ofstream& ofs, bool cytoplasm) {
 	}
 	//cout << "Corner Print - Mark 3" << endl;
 	return;
-}
+}*/
 
 void Cell::print_VTK_MD(ofstream& ofs, bool cytoplasm) {
 	shared_ptr<Wall_Node> currW = left_Corner;
@@ -2248,6 +2258,7 @@ vector<pair<double,shared_ptr<Wall_Node>>> Cell::get_Angle_Wall_Sorted() {
 //Nodes that don't match their neighbors in terms of cells adhered to
 //are returned as "corner" nodes, as well as a few nodes to their left and
 //right.
+/*
 vector<shared_ptr<Wall_Node>> Cell::get_Corner_Nodes() { 
 	//cout << "Corner Calc - Mark 1" << endl;
 	vector<shared_ptr<Wall_Node>> pre_corners;
@@ -2363,7 +2374,7 @@ vector<shared_ptr<Wall_Node>> Cell::get_Corner_Nodes() {
 	}
 	//cout << "Corner Calc - Mark 5" << endl;
 	return corners;
-}
+}*/
 
 void Cell::print_VTK_Growth_Dir(ofstream& ofs, bool cytoplasm) {
 	shared_ptr<Wall_Node> currW = left_Corner;

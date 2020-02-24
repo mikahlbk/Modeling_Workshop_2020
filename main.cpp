@@ -202,11 +202,12 @@ int main(int argc, char* argv[]) {
 		}	
 
 		//This if statement seems redundant
+		
 		/*
 		if(Ti == 10000) {
 			growing_Tissue.update_Signal(false);
 		}*/
-		if(Ti % 5000 == 0) {
+		if(Ti % 30000 == 0) {
 			//cout << "update signal" << endl;
 			growing_Tissue.update_Signal(false);
 			growing_Tissue.update_growth_direction();
@@ -231,7 +232,7 @@ int main(int argc, char* argv[]) {
 		}
 
 		//make adhesion pairs for each cell
-		if(Ti < 10000){
+		if(Ti < 10000) {
 			if(Ti%1000 == 0) {
 				//cout << "adhesion early" << endl;
 				growing_Tissue.update_Adhesion();

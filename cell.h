@@ -226,14 +226,14 @@ class Cell: public enable_shared_from_this<Cell> {
 		void print_VTK_Cell_Progress(ofstream& ofs, bool cytoplasm);
 		void print_VTK_Neighbors(ofstream& ofs, bool cytoplasm); 
 		void print_VTK_Curved(ofstream& ofs, bool cytoplasm); 
-		void print_VTK_Corners(ofstream& ofs, bool cytoplasm);
+		//void print_VTK_Corners(ofstream& ofs, bool cytoplasm);
 		void print_VTK_Growth_Dir(ofstream& ofs, bool cytoplasm); 
 		void print_VTK_MD(ofstream& ofs, bool cytoplasm);
 		void print_VTK_OOP(ofstream& ofs, bool cytoplasm);
 		void print_VTK_Lineage(ofstream& ofs, bool cytoplasm);
 
 		vector<pair<double,shared_ptr<Wall_Node>>> get_Angle_Wall_Sorted();
-		vector<shared_ptr<Wall_Node>> get_Corner_Nodes();
+		//vector<shared_ptr<Wall_Node>> get_Corner_Nodes();
 		void set_MD(int n){ recent_div_MD = n; return;}
 
 		//Division 

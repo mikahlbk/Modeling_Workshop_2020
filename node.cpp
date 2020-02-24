@@ -3,6 +3,7 @@
 //=========================
 #include <iostream>
 #include <vector>
+#include <iterator>
 #include <cmath>
 #include <memory>
 #include <algorithm>
@@ -183,6 +184,7 @@ Wall_Node::Wall_Node(Coord loc,shared_ptr<Cell> my_cell) : Node(loc) {
 	//cross prod
 	added = 0;
 	this->cyt_force = Coord(0,0);
+	adhesion_vector.clear();
 	//this->closest = NULL;
 	//this->closest_len = 100;
 	//adhesion pairs vec
@@ -235,7 +237,7 @@ void Wall_Node::update_Angle() {
 
 	double left_len = left_vect.length();
 	double right_len = right_vect.length();
-	
+
 	if (left_len * right_len == 0) { 
 		my_angle = 0;
 		//cout << "Overlapping nodes in update_Angle()!" << endl;
@@ -283,38 +285,68 @@ void Wall_Node::set_added(int update){
 //threshold and pushes them onto connection vector
 //number of connections specified in phys.h
 void Wall_Node::make_connection(vector<shared_ptr<Wall_Node>> neighbor_walls) {
+	//cout << "Starting make connection" << endl;
 	shared_ptr<Wall_Node> this_ptr = shared_from_this();
+	shared_ptr<Wall_Node> temp;
 	Coord this_ptr_loc = this_ptr->get_Location();
 	vector<shared_ptr<Wall_Node>> this_ptr_adh_vec;
 	this_ptr_adh_vec = this_ptr->get_adh_vec();
 	Coord neighbor_node_loc;
 	double biggest_dist;
 	double curr_distance;
-	int counter = 0;
+	bool my_adh_check;
+	//This is a pair of (distance from me, wall pointer)
+	//We will populate this in the algorithm then read that into
+	//adhesion_vector via adh_push_back.
+	vector<pair<double,shared_ptr<Wall_Node>>> adh_dist_pairs;
+	adh_dist_pairs.clear();
+	bool already_listed;
 	//cout << "neighbor walls size : " << neighbor_walls.size() << endl;
-	for(unsigned int i= 0; i < neighbor_walls.size() ; i++) {
-		counter++;
-		//cout << "neighbor wall: " << counter << endl;
+	for (unsigned int i = 0; i < neighbor_walls.size(); i++) {
+		already_listed = false;
 		neighbor_node_loc = neighbor_walls.at(i)->get_Location();
 		curr_distance = (this_ptr_loc - neighbor_node_loc).length();
-		if(curr_distance < ADHThresh){
-			//	//cout << "within adh thresh" << endl;
-			if(this_ptr_adh_vec.size() < NUMBER_ADH_CONNECTIONS){
-				this_ptr->adh_push_back(neighbor_walls.at(i));
-				this_ptr_adh_vec = this_ptr->get_adh_vec();
+		if (curr_distance < ADHThresh) {
+			//cout << "within adh thresh" << endl;
+			my_adh_check = adh_dist_pairs.size() < NUMBER_ADH_CONNECTIONS;
+			if(my_adh_check) {
+				//Did we already list this node somehow? if so, let's not double-list it.
+				for (unsigned int j = 0; j < adh_dist_pairs.size(); j++) { 
+					temp = adh_dist_pairs.at(j).second;
+					if (neighbor_walls.at(i) == temp) { 
+						already_listed = true;
+					}
+				}
+				if (!already_listed) {
+					adh_dist_pairs.push_back(make_pair( curr_distance, neighbor_walls.at(i)));
+				}
 			} else {
 				//sort in descending order
-				reverse(this_ptr_adh_vec.begin(),this_ptr_adh_vec.end());
-				biggest_dist = (this_ptr_loc - this_ptr_adh_vec.at(0)->get_Location()).length();
-
-				if(curr_distance < biggest_dist){
-					this_ptr->update_adh_vec(neighbor_walls.at(i));
-					this_ptr_adh_vec = this_ptr->get_adh_vec();
+				sort(adh_dist_pairs.begin(),adh_dist_pairs.end(),greater<>());
+				biggest_dist = adh_dist_pairs.at(0).first; 
+				if (curr_distance < biggest_dist) {
+					for (unsigned int j = 0; j < adh_dist_pairs.size(); j++) { 
+						temp = adh_dist_pairs.at(j).second;
+						if (neighbor_walls.at(i) == temp) { 
+							already_listed = true;
+						}
+					}
+					if (!already_listed) { 
+						adh_dist_pairs.at(0) = 
+						(make_pair( curr_distance, neighbor_walls.at(i)));
+					}
 				}
 			}
 		}
 		//cout << "adhesion vec size: " << this_ptr_adh_vec.size()<< endl;
 	}
+
+	for (unsigned int i = 0; i < adh_dist_pairs.size(); i++) { 
+		adh_push_back(adh_dist_pairs.at(i).second);
+		adh_dist_pairs.at(i).second->adh_push_back(this_ptr);
+	}
+	this->one_to_one_check();
+	//cout << "Ending make connection" << endl;
 	return;
 }
 //ensures that if a node has made a connection
@@ -322,22 +354,53 @@ void Wall_Node::make_connection(vector<shared_ptr<Wall_Node>> neighbor_walls) {
 void Wall_Node::one_to_one_check(){
 	shared_ptr<Wall_Node> this_ptr = shared_from_this();
 	vector<shared_ptr<Wall_Node>> this_adh_vec;
+	unsigned int duplicate_index;
+	int my_instances = 0;
 	this_adh_vec = this_ptr->adhesion_vector;
 	vector<shared_ptr<Wall_Node>> connection_adh_vec;
-	for(unsigned int i = 0; i < this_adh_vec.size(); i++){
+	unsigned int i = 0;
+	while (i < this_adh_vec.size()) { 
+		//Get rid of duplicates in my vector.
+		duplicate_index = 0;
+		my_instances = 0;
+		for (unsigned int j = i+1; j < this_adh_vec.size(); j++) {
+			if (this_adh_vec.at(i) == this_adh_vec.at(j)) {
+				duplicate_index = j;
+			}
+		}
+		if (duplicate_index != 0) { 
+			this_ptr->erase_Adhesion_Element(duplicate_index);
+			this_adh_vec = this_ptr->adhesion_vector;
+			continue;
+		}
 		connection_adh_vec = this_adh_vec.at(i)->get_adh_vec();
-		if(find(connection_adh_vec.begin(), connection_adh_vec.end(), this_ptr) != connection_adh_vec.end()){
-			//do nothing its already in there
+		for (unsigned int j = 0; j < connection_adh_vec.size(); j++) { 
+			if (connection_adh_vec.at(j) == this_ptr) { 
+				duplicate_index = j;
+				my_instances++;
+			}
 		}
-		else {
+		if (my_instances >= 2) { 
+			//If my partner has a duplicate, delete it.
+			this_adh_vec.at(i)->erase_Adhesion_Element(duplicate_index);
+			continue;
+		} else if(my_instances == 0) {
+			//Include this in my partner if it's not there.
 			this_adh_vec.at(i)->adh_push_back(this_ptr);
-		}
+		} 
+		i++;
 	}
 	return;
 }
 //clears adhesion vector of current node
 void Wall_Node::clear_adhesion_vec(){
 	this->adhesion_vector.clear();	
+	return;
+}
+//removes index j from adhesion vector, to prevent duplicates.
+void Wall_Node::erase_Adhesion_Element(unsigned int j) { 
+	vector<shared_ptr<Wall_Node>>::iterator erase_position = adhesion_vector.begin();
+	this->adhesion_vector.erase(next(erase_position,j));
 	return;
 }
 //push back a cell wall node onto adhesion vector 
@@ -357,6 +420,7 @@ void Wall_Node::remove_from_adh_vecs() {
 	unsigned int self_index;
 	shared_ptr<Wall_Node> me = shared_from_this();
 	vector<shared_ptr<Wall_Node>> neighbor_connections;
+	this->one_to_one_check();
 	for (unsigned int i = 0; i < adhesion_vector.size(); i++) {
 		self_index = 100;
 		neighbor_connections.clear();
@@ -374,6 +438,7 @@ void Wall_Node::remove_from_adh_vecs() {
 			}
 		}
 	}
+	this->one_to_one_check();
 	return;
 }
 //===========================================================
@@ -669,44 +734,44 @@ Coord Wall_Node::linear_Equation_ADH(shared_ptr<Wall_Node>& wall) {
 		F_lin = (diff_vect/diff_len)*(K_ADH_DIV*(diff_len - MembrEquLen_ADH));
 	}
 	else{
-	if(this->get_My_Cell()->get_Layer() == 1){
-		F_lin = (diff_vect/diff_len)*(K_ADH_L1*(diff_len - MembrEquLen_ADH));
-	}
-	else if(this->get_My_Cell()->get_Layer() == 2){
-		F_lin = (diff_vect/diff_len)*(K_ADH_L2*(diff_len - MembrEquLen_ADH));
-	}
-	else{
-		F_lin = (diff_vect/diff_len)*(K_ADH*(diff_len - MembrEquLen_ADH));
-	}
+		if(this->get_My_Cell()->get_Layer() == 1){
+			F_lin = (diff_vect/diff_len)*(K_ADH_L1*(diff_len - MembrEquLen_ADH));
+		}
+		else if(this->get_My_Cell()->get_Layer() == 2){
+			F_lin = (diff_vect/diff_len)*(K_ADH_L2*(diff_len - MembrEquLen_ADH));
+		}
+		else{
+			F_lin = (diff_vect/diff_len)*(K_ADH*(diff_len - MembrEquLen_ADH));
+		}
 	}
 	return F_lin;
 }
 
 //OLD tensile stress
 /*double Wall_Node::calc_Tensile_Stress() { 
-	//Variable to store tensile stress is TS
-	double TS, TS_left, TS_right;
-	shared_ptr<Wall_Node> me = shared_from_this();
-	shared_ptr<Wall_Node> RNeighbor = me->get_Right_Neighbor();
-	shared_ptr<Wall_Node> LNeighbor = me->get_Left_Neighbor();
-	//Displacements of left and right node form this node)
-	Coord Delta_R = RNeighbor->get_Location() - me->get_Location();
-	Coord Delta_L = LNeighbor->get_Location() - me->get_Location();
-	TS_left = me->get_k_lin() * (Delta_R.length() - me->get_membr_len());
-	TS_right = me->get_k_lin() * (Delta_L.length() - me->get_membr_len());
+//Variable to store tensile stress is TS
+double TS, TS_left, TS_right;
+shared_ptr<Wall_Node> me = shared_from_this();
+shared_ptr<Wall_Node> RNeighbor = me->get_Right_Neighbor();
+shared_ptr<Wall_Node> LNeighbor = me->get_Left_Neighbor();
+//Displacements of left and right node form this node)
+Coord Delta_R = RNeighbor->get_Location() - me->get_Location();
+Coord Delta_L = LNeighbor->get_Location() - me->get_Location();
+TS_left = me->get_k_lin() * (Delta_R.length() - me->get_membr_len());
+TS_right = me->get_k_lin() * (Delta_L.length() - me->get_membr_len());
 
 
-	//Naiive average of left and right tensile stress is TS.
-	TS = (TS_left + TS_right)/static_cast<double>(2);
+//Naiive average of left and right tensile stress is TS.
+TS = (TS_left + TS_right)/static_cast<double>(2);
 
-	//Include adhesion force in the direction tangent to the cell wall
-	
-	Coord outward = calc_Outward_Vector();
-	Coord tangent = outward.perpVector();
-	//calc_Morse_DC(int Ti) doesn't actually make use of Ti, just filling parameter.
-	Coord adh_force = calc_Morse_DC(1);
-	TS += abs(adh_force.dot(tangent));
-	return TS;
+//Include adhesion force in the direction tangent to the cell wall
+
+Coord outward = calc_Outward_Vector();
+Coord tangent = outward.perpVector();
+//calc_Morse_DC(int Ti) doesn't actually make use of Ti, just filling parameter.
+Coord adh_force = calc_Morse_DC(1);
+TS += abs(adh_force.dot(tangent));
+return TS;
 }*/
 
 //NEW tensile stress
@@ -728,27 +793,27 @@ void Wall_Node::calc_Tensile_Stress() {
 		TS_right = me->get_k_lin() * (Delta_L.projectOnto(tangent).length() - me->get_membr_len());
 	} else if (TENSILE_CALC == 3 || TENSILE_CALC == 4) { 
 		TS_right = (
-			Delta_R * ((
-				me->get_k_lin() *
-				(Delta_R.length() - me->get_membr_len())
-				)/(Delta_R.length()))
-		).projectOnto(tangent).length();
-		
+				Delta_R * ((
+						me->get_k_lin() *
+						(Delta_R.length() - me->get_membr_len())
+					   )/(Delta_R.length()))
+			   ).projectOnto(tangent).length();
+
 		TS_left = (
-			Delta_L * ((
-				me->get_k_lin() *
-				(Delta_L.length() - me->get_membr_len())
-				)/(Delta_L.length()))
-		).projectOnto(tangent).length();
+				Delta_L * ((
+						me->get_k_lin() *
+						(Delta_L.length() - me->get_membr_len())
+					   )/(Delta_L.length()))
+			  ).projectOnto(tangent).length();
 	}
 
 	//Naiive average of left and right tensile stress is TS.
 	TS = (TS_left + TS_right)/static_cast<double>(2);
 
 	//Include adhesion force in the direction tangent to the cell wall
-	
+
 	//calc_Morse_DC(int Ti) doesn't actually make use of Ti, just filling parameter.
-	
+
 	Coord adh_force = calc_Morse_DC(1);
 	if (TENSILE_CALC == 1 || TENSILE_CALC == 3) 
 		TS += abs(adh_force.dot(tangent));
@@ -763,31 +828,31 @@ double Wall_Node::get_Updated_Tensile_Stress() {
 
 //Tensile Stress V3
 /*double Wall_Node::calc_Tensile_Stress() { 
-	//Variable to store tensile stress is TS
-	Coord outward = calc_Outward_Vector();
-	Coord tangent = outward.perpVector();
-	double TS, TS_left, TS_right;
-	shared_ptr<Wall_Node> me = shared_from_this();
-	shared_ptr<Wall_Node> RNeighbor = me->get_Right_Neighbor();
-	shared_ptr<Wall_Node> LNeighbor = me->get_Left_Neighbor();
-	//Displacements of left and right node form this node)
-	Coord Delta_R = RNeighbor->get_Location() - me->get_Location();
-	Coord Delta_L = LNeighbor->get_Location() - me->get_Location();
-	TS_right = me->get_k_lin() * (Delta_R.length() - me->get_membr_len())
-		* Delta_R.dot(tangent) / (Delta_R.length());
-	TS_left = me->get_k_lin() * (Delta_L.length() - me->get_membr_len())
-		* Delta_L.dot(tangent) / (Delta_L.length());
+//Variable to store tensile stress is TS
+Coord outward = calc_Outward_Vector();
+Coord tangent = outward.perpVector();
+double TS, TS_left, TS_right;
+shared_ptr<Wall_Node> me = shared_from_this();
+shared_ptr<Wall_Node> RNeighbor = me->get_Right_Neighbor();
+shared_ptr<Wall_Node> LNeighbor = me->get_Left_Neighbor();
+//Displacements of left and right node form this node)
+Coord Delta_R = RNeighbor->get_Location() - me->get_Location();
+Coord Delta_L = LNeighbor->get_Location() - me->get_Location();
+TS_right = me->get_k_lin() * (Delta_R.length() - me->get_membr_len())
+ * Delta_R.dot(tangent) / (Delta_R.length());
+ TS_left = me->get_k_lin() * (Delta_L.length() - me->get_membr_len())
+ * Delta_L.dot(tangent) / (Delta_L.length());
 
 
-	//Naiive average of left and right tensile stress is TS.
-	TS = (TS_left + TS_right)/static_cast<double>(2);
+//Naiive average of left and right tensile stress is TS.
+TS = (TS_left + TS_right)/static_cast<double>(2);
 
-	//Include adhesion force in the direction tangent to the cell wall
-	
-	//calc_Morse_DC(int Ti) doesn't actually make use of Ti, just filling parameter.
-	Coord adh_force = calc_Morse_DC(1);
-	TS += abs(adh_force.dot(tangent));
-	return TS;
+//Include adhesion force in the direction tangent to the cell wall
+
+//calc_Morse_DC(int Ti) doesn't actually make use of Ti, just filling parameter.
+Coord adh_force = calc_Morse_DC(1);
+TS += abs(adh_force.dot(tangent));
+return TS;
 }*/
 
 double Wall_Node::calc_Shear_Stress() { 
