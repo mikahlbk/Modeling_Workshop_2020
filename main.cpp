@@ -352,7 +352,7 @@ int main(int argc, char* argv[]) {
 			ofs_loc_no_cyt.open(Locations_no_cyt.c_str());
 			growing_Tissue.locations_output(ofs_loc_no_cyt,false,Ti);
 			ofs_loc_no_cyt.close();
-			out2++;
+			out2 += VTK_PER_DATA_POINT;
 			Locations_cyt = locations_cyt_folder + locations_initial + to_string(out3) + ".txt";
 			ofs_loc_cyt.open(Locations_cyt.c_str());
 			growing_Tissue.locations_output(ofs_loc_cyt,true,Ti);
