@@ -42,8 +42,6 @@ int NUM_STEPS_PER_FRAME = 2500;
 int VTK_PER_DATA_POINT = 5;
 int RECENT_DIV_NUM_FRAMES = 10;
 bool CHEMICAL_GD = true; //./batchGenerator -par -Chem_GD <1 or 0>
-bool HILL_PROB = false;  //Needs to be set to true for hill to apply.
-int HILL_N = 1;
 //Must be declared in externs.h
 //For clarity, listed as comments in phys.h
 
@@ -81,9 +79,6 @@ int main(int argc, char* argv[]) {
 			OOP_PROBABILITY = stod(argv[i+1]);
 		} else if (!strcmp(argv[i], "-Chem_GD")) { 
 			CHEMICAL_GD = stoi(argv[i+1]) ? true : false;
-		} else if (!strcmp(argv[i], "-HILL_N")) {
-			HILL_N = stoi(argv[i+1]);
-			HILL_PROB = true;
 		}
 	}
 	if (DIV_MECHANISM == 0) { 

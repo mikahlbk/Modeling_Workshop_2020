@@ -16,7 +16,8 @@ const int INIT_NUM_CYT_NODES = 15;
 const int INIT_WALL_NODES = 100;
 const double pi = acos(-1.0);
 const double HILL_K = 1.29672531651;
-//const int HILL_N = 1;
+const int HILL_N = 10;
+const bool HILL_PROB = true;  //Needs to be set to true for hill to apply.
 //these are used to control equi angles
 //and bending spring constants
 const double ANGLE_FIRST_QUAD = 0.785398;
