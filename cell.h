@@ -76,6 +76,8 @@ class Cell: public enable_shared_from_this<Cell> {
 		//set/get damping
 		void set_Damping(double new_damping);
 		double get_Damping() {return damping;}
+		// get boundary
+		int get_Boundary() {return boundary;}
 		//set/get life length
 		void update_Life_Length();
 		void rescale_Life_Length(int old_growth_rate,bool init_phase);
@@ -108,9 +110,9 @@ class Cell: public enable_shared_from_this<Cell> {
 		void update_Cell_Center();
 		Coord get_Cell_Center() {return cell_center;}
 		//set/get WUS conc
-		void calc_WUS(Coord L1_AVG);
+		void calc_WUS(Coord L1_AVG, double WUS_dropdown);
 		double get_WUS_concentration() {return wuschel;}
-		void calc_CK(Coord L1_AVG);
+		void calc_CK(Coord L1_AVG, double CK_dropdown);
 		double get_CYT_concentration() {return cytokinin;}
 		double getRandomDoubleUsingNormalDistribution(double mean, double sigma);
 		//set growth rate based on WUS
@@ -208,6 +210,7 @@ class Cell: public enable_shared_from_this<Cell> {
 		void print_locations(ofstream& ofs);
 		void print_Cell_Data(ofstream& ofs, int Ti);
 		vector<double> calc_Orientation_Stats();
+		double calc_Long_Length();
 		double calc_Depth();
 		int get_Lineage() {return lineage;} 
 		void set_Lineage(int parent_lineage);

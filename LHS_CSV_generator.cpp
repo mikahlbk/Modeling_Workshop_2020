@@ -245,7 +245,7 @@ int main(int argc, char* argv[]) {
 			delimiter = (j == P-1) ? '\n' : ','; 
 			CSV << Y_k.at(j) << delimiter;
 		}
-		//Print X_z to CSV for all parameter values.
+		//Print X_z, or Y_-z to CSV for all parameter values.
 		for (int z = 0; z < P; z++) { 
 			for (int j = 0; j < P; j++) { 
 				delimiter = (j == P-1) ? '\n' : ','; 

@@ -356,7 +356,7 @@ int Tissue::get_next_random(int dist, int count){
 		return this->dist4.at(count);
 	}
 }
-double Tissue::get_normal_number(double mean, double sigma){
+double Tissue::get_normal_number(double mean, double sigma) {
 	std::normal_distribution<double> distribution(mean,sigma);
 	double gr = distribution(this->gen);
 	return gr;
@@ -364,19 +364,37 @@ double Tissue::get_normal_number(double mean, double sigma){
 void Tissue::update_Signal(bool initial_update){
 	
 	Coord L1_AVG = this->Compute_L1_AVG();
+	update_Avg_Cell_Diameter();
 	for(int i = 0; i < num_cells; i++){
 		//cout<< "WUS" << endl;
-		cells.at(i)->calc_WUS(L1_AVG);
+		//Used to have 14 as our second parameter
+		cells.at(i)->calc_WUS(L1_AVG, 2.0 * get_Avg_Cell_Diameter());
 		//cout << "CK" << endl;
-		cells.at(i)->calc_CK(L1_AVG);
+		//Used to have 21 as our second parameter
+		cells.at(i)->calc_CK(L1_AVG, 3.0 * get_Avg_Cell_Diameter());
 		//cout << "GROWTH RATE" << endl;
 		cells.at(i)->set_growth_rate(initial_update);
 		//cout<< "growth rate: " << i << " " << cells.at(i)->get_growth_rate() << endl;
-
 	}
 	return;
 
 }
+
+void Tissue::update_Avg_Cell_Diameter() { 
+	double acd = 0;
+	int count = 0;
+	shared_ptr<Cell> temp;
+	for (int i = 0; i < num_cells; i++) { 
+		temp = cells.at(i);
+		if(temp->get_Layer() <= 4 && (temp->get_Boundary() == 0 )) { 
+			acd += cells.at(i)->calc_Long_Length();
+			count++;
+		}
+	}
+
+	this->avg_cell_diam = acd / static_cast<double>(count);
+}
+
 void Tissue::update_growth_direction(){
 	
 	for(int i = 0; i < num_cells; i++){

@@ -341,13 +341,13 @@ void Cell::update_Cell_Progress() {
 	this->Cell_Progress++;
 	return;
 }*/
-void Cell::calc_WUS(Coord L1_AVG) {
+void Cell::calc_WUS(Coord L1_AVG, double WUS_dropdown) {
 	
 	//new data from eric
 	//CZ ~5 cells wide
 	//layer 1
 	//from 2018 paper
-	double distance = (cell_center-(L1_AVG-Coord(0,14))).length();
+	double distance = (cell_center-(L1_AVG-Coord(0,WUS_dropdown))).length();
 	distance = distance * WUS_RAD_CONTRACTION_FACTOR; 
 	//if(distance < 140*.15){
 	this->wuschel = 84.6*exp(-0.01573*(distance));
@@ -357,8 +357,8 @@ void Cell::calc_WUS(Coord L1_AVG) {
 	//}
 	return;
 }
-void Cell::calc_CK(Coord L1_AVG) {
-	double distance = (cell_center-(L1_AVG-Coord(0,21))).length();
+void Cell::calc_CK(Coord L1_AVG, double CK_dropdown) {
+	double distance = (cell_center-(L1_AVG-Coord(0,CK_dropdown))).length();
 	distance = distance * CK_RAD_CONTRACTION_FACTOR;
 	if((this->get_Layer() == 1)||(this->get_Layer() == 2)) {
 		this->cytokinin = 0;
@@ -411,29 +411,26 @@ void Cell::set_growth_rate(bool first_growth_rate) {
 
 	//this->growth_rate = my_tissue->unifRandInt(5000,30000);
 	//mt19937 gen = this->get_Tissue()->get_random_generator();
-	if(this->wuschel < 55){
-	  mean = 10800;
-	  sigma = 1800;
-	  this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
-	//this->growth_rate = my_tissue->unifRandInt(2000,10000);
-	//cout << "growth rate:" << growth_rate << endl;
-	}
-	else if(this->wuschel < 65){
-	mean = 14400;
-	sigma = 1800;
-	this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
-	//this->growth_rate = my_tissue->unifRandInt(10000,12510);
-	//cout << "growth rate" << growth_rate << endl;
-	}
-	else if(this->wuschel < 75){
-	mean = 19800;
-	sigma = 3600;
-	this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
-	}
-	else{
-	mean = 39600;
-	sigma = 16200;
-	this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
+	if(this->wuschel < 55) {
+		mean = 10800;
+		sigma = 1800;
+		this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
+		//this->growth_rate = my_tissue->unifRandInt(2000,10000);
+		//cout << "growth rate:" << growth_rate << endl;
+	} else if(this->wuschel < 65) {
+		mean = 14400;
+		sigma = 1800;
+		this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
+		//this->growth_rate = my_tissue->unifRandInt(10000,12510);
+		//cout << "growth rate" << growth_rate << endl;
+	} else if(this->wuschel < 75) {
+		mean = 19800;
+		sigma = 3600;
+		this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
+	} else {
+		mean = 39600;
+		sigma = 16200;
+		this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
 	}
 
 	//else if((this->wuschel >=78) && (this->wuschel <81.8)){
@@ -537,6 +534,7 @@ void Cell::update_growth_direction(){
 	
 	if (CHEMICAL_GD) { 
 		if (HILL_PROB) { 
+
 			if(this->stem == 1) { //Stem grows vertically
 				this->growth_direction = Coord(0,1);
 			} else if(this->boundary == 1 || !growing_this_cycle) {
@@ -548,7 +546,10 @@ void Cell::update_growth_direction(){
 			} else { 
 				this->growth_direction = Coord(1,0);
 			}
+
 		} else { 
+			//Deprecated block - unused
+			//
 			if(this->boundary == 1 || !growing_this_cycle){
 				this->growth_direction = Coord(0,0);
 			} else if(this->stem == 1) { //Stem grows vertically
@@ -568,8 +569,6 @@ void Cell::update_growth_direction(){
 			this->growth_direction = Coord(0,1);
 		} else if((this->layer == 1)||(this->layer == 2)) {
 			this->growth_direction = Coord(1,0);
-		} else if(rand()% 100 < 30) {
-			this->growth_direction = Coord(0,0);
 		} else {
 			if(rand()% 100 < 36) {
 				this->growth_direction = Coord(1,0);
@@ -872,7 +871,7 @@ void Cell::update_Cell_Center() {
 		Coord curr_loc;
 #pragma omp declare reduction(+:Coord:omp_out+=omp_in) initializer(omp_priv(omp_orig))
 #pragma omp for reduction(+:total_location) schedule(static,1)
-		for(unsigned int i=0;i<walls.size();i++) {
+		for (unsigned int i = 0; i < walls.size(); i++) {
 			curr_loc = walls.at(i)->get_Location();
 			total_location += curr_loc;
 		}
@@ -1250,7 +1249,7 @@ void Cell::division_check() {
 		//Case where the cell "divides out of plane"
 		this->reset_Cell_Progress();
 		this->reset_Life_Length();
-		if (my_tissue->unifRand() < 0.5) { 
+		if (my_tissue->unifRand() < OOP_PROBABILITY) { 
 			set_Growing_This_Cycle(false);
 		} else { 
 			set_Growing_This_Cycle(true);
@@ -1851,6 +1850,27 @@ vector<double> Cell::calc_Orientation_Stats() {
 
 	return orientation_stats;
 }
+
+double Cell::calc_Long_Length() { 
+	//SPEEDUP POSSIBLE: Don't calc area separately, fold into Errera usage.
+	vector<shared_ptr<Wall_Node>> short_axis_nodes;
+	vector<shared_ptr<Wall_Node>> long_axis_nodes;
+	Errera_div(short_axis_nodes);
+	Coord v_1 = short_axis_nodes.at(0)->get_Location();
+	Coord v_2 = short_axis_nodes.at(1)->get_Location();
+	Coord short_direction = (v_2-v_1)/((v_2-v_1).length());
+	//Note that this is ALWAYS taken to be with theta between 0 and 180 degrees.
+	Coord long_direction = short_direction.perpVector();
+	find_nodes_for_div_plane(long_direction, long_axis_nodes, 11); 
+	Coord v_3 = long_axis_nodes.at(0)->get_Location();
+	Coord v_4 = long_axis_nodes.at(1)->get_Location();
+	double long_length = (v_4 - v_3).length();
+
+	return long_length;
+}
+
+
+
 //Note that negative number returned means that you're higher up that the L1 Central cell.
 //This is possible if the dome is skewed or if L2 cells creep up through L1.
 double Cell::calc_Depth() { 

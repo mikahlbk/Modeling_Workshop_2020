@@ -511,7 +511,7 @@ shared_ptr<Cell> Cell::division() {
 	} else { 
 		switch (DIV_MECHANISM) { 
 			case 1: 
-				//Errera'r rule
+				//Errera's rule
 				Errera_div(nodes);
 				break;
 			case 2:
@@ -536,6 +536,22 @@ shared_ptr<Cell> Cell::division() {
 			case 3:
 				//Mechanical Division
 				find_nodes_for_div_plane_mechanical(nodes); 
+				break;
+			case 4:
+				//Merged Mechanism
+				if (my_tissue->unifRand() < MECH_DIV_PROB) {
+					//Do the mech thing
+					find_nodes_for_div_plane_mechanical(nodes); 
+				} else {
+					//Do the chemical thing
+					if(my_tissue->unifRand() < hill_Prob()) {
+						//hill_Prob is the probability of periclinal.
+						orientation = Coord(1,0); //periclinal division
+					} else {
+						//Else anticlinal.
+						orientation = Coord(0,1);
+					}
+				}
 				break;
 			default:
 				//cout << "DIV_MECH NOT ENTERED. Exiting..." << endl;
@@ -746,11 +762,11 @@ shared_ptr<Cell> Cell::division() {
 	this->update_Cell_Center();
 	sister->update_Cell_Center();
 	Coord L1_AVG = this->get_Tissue()->Compute_L1_AVG();
-
-	this->calc_WUS(L1_AVG);
-	sister->calc_WUS(L1_AVG);
-	this->calc_CK(L1_AVG);
-	sister->calc_CK(L1_AVG);
+	double acd = this->get_Tissue()->get_Avg_Cell_Diameter();
+	this->calc_WUS(L1_AVG, 2 * acd);
+	sister->calc_WUS(L1_AVG, 2 * acd);
+	this->calc_CK(L1_AVG, 3 * acd);
+	sister->calc_CK(L1_AVG, 3 * acd);
 
 	//Set sister growth rate at random
 	/*

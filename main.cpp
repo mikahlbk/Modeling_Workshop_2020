@@ -32,7 +32,8 @@ using namespace std;
 bool OUT_OF_PLANE_GROWTH = true; //./batchGenerator -flag OOP_off
 
 //EXPERIMENTAL PARAMTERS
-double OOP_PROBABILITY = 0.5; //Defaults to 0.5
+double OOP_PROBABILITY = 0.3; //Defaults to 0.3
+double MECH_DIV_PROB = 0.5;
 int DIV_MECHANISM = 1; //./batchGenerator -par -div <int>
 //1 - Errera, 2 - Chem, 3 - Mech
 double WUS_RAD_CONTRACTION_FACTOR = 1;//./batchGenerator -par -WR <double>
@@ -49,16 +50,19 @@ int main(int argc, char* argv[]) {
 
 	// reads in name of folder that 
 	// stores vtk files, given in run.sh
-	//usually called Animate1
+	//This is "Animate_Cyt"
 	string anim_folder = argv[1];
 	//Reads in the name of folder that stores VTK files for
 	//visualization without cytoplasm nodes.
+	//This is "Animate_No_Cyt"
 	string no_cyt_folder = argv[4];
 	//reads in name of folder that 
 	//stores data output, given in run.sh
+	//This is "Nematic"
 	string locations_cyt_folder = argv[3];
 	//this is a folder that holds data output
 	//without cytoplasm node info
+	//This is "Locations"
 	string locations_no_cyt_folder = argv[2];
 	//Folders to hold Cell and Tissue level data
 	string cell_data_folder = argv[5];
@@ -79,7 +83,7 @@ int main(int argc, char* argv[]) {
 			OOP_PROBABILITY = stod(argv[i+1]);
 		} else if (!strcmp(argv[i], "-Chem_GD")) { 
 			CHEMICAL_GD = stoi(argv[i+1]) ? true : false;
-		}
+		} 
 	}
 	if (DIV_MECHANISM == 0) { 
 		//cout << "DIV_MECHANISM not set.  Exiting..." << endl;
@@ -178,7 +182,12 @@ int main(int argc, char* argv[]) {
 	int Ti = 0;
 	int terminal_timer = 0;
 	bool is_terminal = false;
-	while (terminal_timer < 182000) {
+
+
+	//Delta t is approximately 0.4s
+	//int terminal_timeout = 182000; //Plant stops at 20.2 hours after all cells divide
+	int terminal_timeout = 12500; // Plant stops at 1.5 hours after all cells divide
+	while (terminal_timer < terminal_timeout) {
 		//keep track of simulation runs
 		if (!is_terminal) {
 			if (Ti%1000 == 0) is_terminal = growing_Tissue.terminal_Tissue();
@@ -199,10 +208,11 @@ int main(int argc, char* argv[]) {
 
 		//This if statement seems redundant
 		
-		/*
+		
 		if(Ti == 10000) {
 			growing_Tissue.update_Signal(false);
-		}*/
+			growing_Tissue.update_growth_direction();
+		}
 		if(Ti % 30000 == 0) {
 			//cout << "update signal" << endl;
 			growing_Tissue.update_Signal(false);

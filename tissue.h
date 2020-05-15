@@ -32,6 +32,7 @@ class Tissue {
 		int num_deleted;
 		int num_IP_divs;
 		int num_divs;
+		double avg_cell_diam;
 		Coord top_cell_center;
 		mt19937 gen;
 		vector<int> dist1;
@@ -50,6 +51,8 @@ class Tissue {
 		void update_Num_Cells(shared_ptr<Cell>& new_Cell);
 		int  get_num_cells() {return num_cells;}
 		Coord Compute_L1_AVG();
+		void update_Avg_Cell_Diameter();
+		double get_Avg_Cell_Diameter() {return avg_cell_diam;}
 		int return_counts(int index);
 		void set_up_counts();
 		void set_counts(int index);
@@ -62,8 +65,9 @@ class Tissue {
 		void delete_Wall(int Ti);
 		void update_Adhesion();
 		double get_normal_number(double mean, double sigma); //mt19937 get_Random_Generator(){return gen;}
-		//not in use
+		// Not in use --------
 		void update_Linear_Bending_Springs();
+		// ------
 		
 		void update_Cell_Cycle(int Ti);
 		void division_check();
