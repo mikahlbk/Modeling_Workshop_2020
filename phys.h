@@ -18,6 +18,7 @@ const double pi = acos(-1.0);
 const double HILL_K = 1.29672531651;
 const int HILL_N = 10;
 const bool HILL_PROB = true;  //Needs to be set to true for hill to apply.
+const int TISSUE_BASE = 45;
 //these are used to control equi angles
 //and bending spring constants
 const double ANGLE_FIRST_QUAD = 0.785398;

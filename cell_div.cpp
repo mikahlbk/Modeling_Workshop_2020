@@ -505,9 +505,19 @@ shared_ptr<Cell> Cell::division() {
 	bool forced_anticlinal = ((this->layer == 1)||(this->layer==2))
 		&& L1_L2_FORCED_ANTICLINAL_DIV;
 
+	vector<shared_ptr<Cell>> cells;
+	my_tissue->get_Cells(cells);
+	Coord tissue_base_location = cells.at(TISSUE_BASE)->get_Cell_Center();
+
 	if (forced_anticlinal) { 
-		orientation = Coord(0,1);
+
+		//orientation = Coord(0,1);
+		Coord pre_orientation = this->get_Cell_Center() - tissue_base_location;
+		orientation = pre_orientation / pre_orientation.length();
+
 		find_nodes_for_div_plane(orientation,nodes,11);
+
+
 	} else { 
 		switch (DIV_MECHANISM) { 
 			case 1: 
