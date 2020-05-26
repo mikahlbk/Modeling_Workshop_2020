@@ -347,14 +347,28 @@ void Cell::calc_WUS(Coord L1_AVG, double WUS_dropdown) {
 	//CZ ~5 cells wide
 	//layer 1
 	//from 2018 paper
-	double distance = (cell_center-(L1_AVG-Coord(0,WUS_dropdown))).length();
-	distance = distance * WUS_RAD_CONTRACTION_FACTOR; 
-	//if(distance < 140*.15){
-	this->wuschel = 84.6*exp(-0.01573*(distance));
-	//}
-	//else {
-	//	this->wuschel = 9.36*exp(0.01573*(-distance/.15+280));
-	//}
+	if(Weird_WUS == 0){
+		double distance = (cell_center-(L1_AVG-Coord(0,WUS_dropdown))).length();
+		distance = distance * WUS_RAD_CONTRACTION_FACTOR; 
+		this->wuschel = 84.6*exp(-0.01573*(distance));
+	}else if(Weird_WUS == 1){
+		double distance = (cell_center-(L1_AVG-Coord(0,WUS_dropdown))).length();
+		distance = distance * WUS_RAD_CONTRACTION_FACTOR; 
+		if(layer == 3){
+			this->wuschel = 84.6*exp(-0.01573*(distance));
+		}else {
+			this->wuschel = 65;
+		}
+	}else if(Weird_WUS == 2){
+		double distance = (cell_center-(L1_AVG-Coord(0,WUS_dropdown))-Coord(-40,0)).length();
+		distance = distance * WUS_RAD_CONTRACTION_FACTOR; 
+		if((layer == 1)||(layer == 2)||(layer ==3)){
+			this->wuschel = 84.6*exp(-0.01573*(distance));
+		}else {
+			this->wuschel = 65;
+		}
+	}
+
 	return;
 }
 void Cell::calc_CK(Coord L1_AVG, double CK_dropdown) {

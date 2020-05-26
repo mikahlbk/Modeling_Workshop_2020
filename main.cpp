@@ -30,7 +30,7 @@ using namespace std;
 //FREQUENTLY CHANGED VALUES
 //Flags
 bool OUT_OF_PLANE_GROWTH = true; //./batchGenerator -flag OOP_off
-
+bool WUS_LEVEL = false;
 //EXPERIMENTAL PARAMTERS
 double OOP_PROBABILITY = 0.3; //Defaults to 0.3
 double MECH_DIV_PROB = 0.5;
@@ -43,6 +43,7 @@ int NUM_STEPS_PER_FRAME = 2500;
 int VTK_PER_DATA_POINT = 5;
 int RECENT_DIV_NUM_FRAMES = 10;
 bool CHEMICAL_GD = true; //./batchGenerator -par -Chem_GD <1 or 0>
+int Weird_WUS = 0;
 //Must be declared in externs.h
 //For clarity, listed as comments in phys.h
 
@@ -83,7 +84,11 @@ int main(int argc, char* argv[]) {
 			OOP_PROBABILITY = stod(argv[i+1]);
 		} else if (!strcmp(argv[i], "-Chem_GD")) { 
 			CHEMICAL_GD = stoi(argv[i+1]) ? true : false;
-		} 
+		}else if(!strcmp(argv[i], "-WUS_loc")) {
+			Weird_WUS = stoi(argv[i+1]);
+		}else if(!strcmp(argv[i], "-WUS_change")) {
+			WUS_LEVEL = true;
+		}
 	}
 	if (DIV_MECHANISM == 0) { 
 		//cout << "DIV_MECHANISM not set.  Exiting..." << endl;
