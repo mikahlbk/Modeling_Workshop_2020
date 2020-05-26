@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
 		}else if(!strcmp(argv[i], "-WUS_loc")) {
 			Weird_WUS = stoi(argv[i+1]);
 		}else if(!strcmp(argv[i], "-WUS_change")) {
-			WUS_LEVEL = 1;
+			WUS_LEVEL = stoi(argv[i+1]);
 		}
 	}
 	if (DIV_MECHANISM == 0) { 
