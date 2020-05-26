@@ -26,7 +26,8 @@ int main(int argc, char* argv[]) {
 	char TC[100] = "";
 	char WUS_CF[100]= "";
 	char CK_CF[100] = "";
-	string bigdata_path = "/bigdata/wchenlab/shared/Plant_SCE_output/";
+	char WUS_LEV[100] = "";
+	string bigdata_path = "/bigdata/wchenlab/shared/Plant_SCE_output_Final_for_paper";
 	string final_path;
 	int divDataCutoff;
 	bool bigdata = false;

@@ -367,7 +367,13 @@ void Cell::calc_WUS(Coord L1_AVG, double WUS_dropdown) {
 		}else {
 			this->wuschel = 65;
 		}
+	}else if(WUS_LEVEL == 1){
+		double distance = (cell_center-(L1_AVG-Coord(0,WUS_dropdown))).length();
+		distance = distance * WUS_RAD_CONTRACTION_FACTOR; 
+		this->wuschel = 84.6*exp(-0.01573*(distance));
+		this->wuschel = this->wuschel -20;
 	}
+
 
 	return;
 }

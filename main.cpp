@@ -30,7 +30,7 @@ using namespace std;
 //FREQUENTLY CHANGED VALUES
 //Flags
 bool OUT_OF_PLANE_GROWTH = true; //./batchGenerator -flag OOP_off
-bool WUS_LEVEL = false;
+bool WUS_LEVEL = 0;
 //EXPERIMENTAL PARAMTERS
 double OOP_PROBABILITY = 0.3; //Defaults to 0.3
 double MECH_DIV_PROB = 0.5;
@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
 		}else if(!strcmp(argv[i], "-WUS_loc")) {
 			Weird_WUS = stoi(argv[i+1]);
 		}else if(!strcmp(argv[i], "-WUS_change")) {
-			WUS_LEVEL = true;
+			WUS_LEVEL = 1;
 		}
 	}
 	if (DIV_MECHANISM == 0) { 
