@@ -561,6 +561,7 @@ shared_ptr<Cell> Cell::division() {
 						//Else anticlinal.
 						orientation = Coord(0,1);
 					}
+					find_nodes_for_div_plane(orientation,nodes,11);
 				}
 				break;
 			default:
