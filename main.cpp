@@ -35,7 +35,7 @@ bool WUS_LEVEL = false;
 double OOP_PROBABILITY = 0.3; //Defaults to 0.3
 double MECH_DIV_PROB = 0.5;
 int DIV_MECHANISM = 1; //./batchGenerator -par -div <int>
-//1 - Errera, 2 - Chem, 3 - Mech
+//1 - Errera, 2 - Chem, 3 - Mech, 4 - Merged
 double WUS_RAD_CONTRACTION_FACTOR = 1;//./batchGenerator -par -WR <double>
 double CK_RAD_CONTRACTION_FACTOR = 1; //./batchGenerator -par -CKR <double>
 int TENSILE_CALC = 4; //./batchGenerator -par TC <int> 
@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) {
 	if (DIV_MECHANISM == 0) { 
 		//cout << "DIV_MECHANISM not set.  Exiting..." << endl;
 		exit(1);
-	} else if (DIV_MECHANISM > 3 || DIV_MECHANISM < 1) { 
+	} else if (DIV_MECHANISM > 4 || DIV_MECHANISM < 1) { 
 		//cout << "DIV_MECHANISM Input failed. Exiting..." << endl;
 		exit(1);
 	}
