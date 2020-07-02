@@ -195,7 +195,12 @@ int main(int argc, char* argv[]) {
 	while (terminal_timer < terminal_timeout) {
 		//keep track of simulation runs
 		if (!is_terminal) {
-			if (Ti%1000 == 0) is_terminal = growing_Tissue.terminal_Tissue();
+			if (Ti%1000 == 0) {
+				is_terminal = growing_Tissue.terminal_Tissue();
+				if (is_terminal) { 
+					terminal_timeout = 2*Ti;
+				}
+			}
 		} else { 
 			terminal_timer++;
 		}

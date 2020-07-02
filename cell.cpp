@@ -356,7 +356,7 @@ void Cell::calc_WUS(Coord L1_AVG, double WUS_dropdown) {
 		distance = distance * WUS_RAD_CONTRACTION_FACTOR; 
 		if(layer == 3){
 			this->wuschel = 84.6*exp(-0.01573*(distance));
-		}else {
+		} else {
 			this->wuschel = 65;
 		}
 	} else if (Weird_WUS == 2) {
@@ -432,24 +432,28 @@ void Cell::set_growth_rate(bool first_growth_rate) {
 	//this->growth_rate = my_tissue->unifRandInt(5000,30000);
 	//mt19937 gen = this->get_Tissue()->get_random_generator();
 	if(this->wuschel < 55) {
-		mean = 10800;
-		sigma = 1800;
+		//WUS less than 55
+		mean = 10800; // 18 hr
+		sigma = 1800/2; // 1.5 hr
 		this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
 		//this->growth_rate = my_tissue->unifRandInt(2000,10000);
 		//cout << "growth rate:" << growth_rate << endl;
 	} else if(this->wuschel < 65) {
-		mean = 14400;
-		sigma = 1800;
+		// WUS betseen 55 and 65
+		mean = 14400; // 24 hr
+		sigma = 1800/2; // 1.5 hr
 		this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
 		//this->growth_rate = my_tissue->unifRandInt(10000,12510);
 		//cout << "growth rate" << growth_rate << endl;
 	} else if(this->wuschel < 75) {
-		mean = 19800;
-		sigma = 3600;
+		//Wus between 65 and 75
+		mean = 19800; // 33hr
+		sigma = 3600/2; // 6 hr
 		this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
 	} else {
-		mean = 39600;
-		sigma = 16200;
+		//If WUS > 75
+		mean = 39600; //66 hr
+		sigma = 16200/2; //13.5 hr
 		this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
 	}
 
@@ -1746,10 +1750,16 @@ void Cell::print_VTK_Adh(ofstream& ofs) {
 	shared_ptr<Wall_Node> neighbor = NULL;
 	shared_ptr<Wall_Node> curr_wall = left_Corner;
 	vector<shared_ptr<Wall_Node>> nodes;
-
+	int ERR5_CTR = 0;
+	int ERR6_CTR = 0;
 	do {
+		cout << "ERR5_CTR: " << ERR5_CTR++;
+		ERR6_CTR = 0;
 		for(unsigned int i = 0; i < curr_wall->get_adh_vec().size(); i++) {
+			cout << "ERR6_CTR: " << ERR6_CTR++ << " i= " << i;
+			cout.flush();
 			nodes = curr_wall->get_adh_vec();
+			cout << " AdhVec size=" << nodes.size() << endl;
 			neighbor = nodes.at(i);
 			if (neighbor != NULL) {
 				my_id = curr_wall->get_VTK_Id();
@@ -1908,21 +1918,25 @@ void Cell::print_VTK_Points(ofstream& ofs, int& count, bool cytoplasm) {
 	shared_ptr<Wall_Node> curr_wall = left_Corner;
 	shared_ptr<Wall_Node> orig = curr_wall;
 	////cout << "knows left corner" << endl;
+	int ERR2CTR_WALL = 0;
 	do {
 		Coord loc = curr_wall->get_Location();
 		ofs << loc.get_X() << ' ' << loc.get_Y() << ' ' << 0 << endl;
 		//cout<< "maybe cant do left neighbor" << endl;
 		curr_wall = curr_wall->get_Left_Neighbor();
 		count++;
-		//cout << "did it  " << count << endl;
+		cout << "ERR2CTR: " << ERR2CTR_WALL << endl;
+		ERR2CTR_WALL++;
 	} while (curr_wall != orig);
-
+	int ERR3CTR_CYT = 0;
 	if (cytoplasm) { 
 		//cout << "walls worked" << endl;
 		for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 			Coord loc = cyt_nodes.at(i)->get_Location();
 			ofs << loc.get_X() << ' ' << loc.get_Y() << ' ' << 0 << endl;
 			count++;
+			cout << "ERR3CTR: " << ERR3CTR_CYT << endl;
+			ERR3CTR_CYT++;
 		};
 	}
 

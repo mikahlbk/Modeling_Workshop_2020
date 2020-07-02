@@ -122,7 +122,7 @@ int main(int argc, char* argv[]) {
 	ofs << "#SBATCH --job-name=\"" << test << "\"\n";
 	ofs << "#SBATCH -p " << p << " \n";
 	//ofs << "SBATCH whatever thing for reservation... 
-	ofs << "export OMP_NUM_THREADS " << cores << "\n";
+	ofs << "export OMP_NUM_THREADS=" << cores << "\n";
 	ofs << "mkdir " << final_path << "Animate_Cyt_" << test << "\n";
 	ofs << "mkdir " << final_path << "Nematic_test_" << test <<"\n";
 	ofs << "mkdir " << final_path << "Locations_test_" << test << "\n";
