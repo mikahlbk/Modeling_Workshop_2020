@@ -1750,13 +1750,13 @@ void Cell::print_VTK_Adh(ofstream& ofs) {
 	shared_ptr<Wall_Node> neighbor = NULL;
 	shared_ptr<Wall_Node> curr_wall = left_Corner;
 	vector<shared_ptr<Wall_Node>> nodes;
-	int ERR5_CTR = 0;
-	int ERR6_CTR = 0;
+	//int ERR5_CTR = 0;
+	//int ERR6_CTR = 0;
 	do {
-		cout << "ERR5_CTR: " << ERR5_CTR++;
-		ERR6_CTR = 0;
+		//cout << "ERR5_CTR: " << ERR5_CTR++;
+		//ERR6_CTR = 0;
 		for(unsigned int i = 0; i < curr_wall->get_adh_vec().size(); i++) {
-			cout << "ERR6_CTR: " << ERR6_CTR++ << " i= " << i;
+			//cout << "ERR6_CTR: " << ERR6_CTR++ << " i= " << i;
 			cout.flush();
 			nodes = curr_wall->get_adh_vec();
 			cout << " AdhVec size=" << nodes.size() << endl;

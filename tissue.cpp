@@ -807,7 +807,7 @@ void Tissue::print_VTK_File(ofstream& ofs, bool cytoplasm) {
 		start_points.push_back(count);
 		cells.at(i)->print_VTK_Points(ofs,count,cytoplasm);
 		end_points.push_back(count - 1);
-		cout << "ERR1 cell " << i << endl;
+		//cout << "ERR1 cell " << i << endl;
 		cout << "Start_points:" << endl;
 		for  (unsigned int j = 0; j < start_points.size(); j++) { 
 			cout << start_points.at(j) << ", ";
@@ -824,9 +824,9 @@ void Tissue::print_VTK_File(ofstream& ofs, bool cytoplasm) {
 	ofs << "CELLS " << cells.size() + rel_cnt<< ' ' << 
 		(num_Points + start_points.size()) + (rel_cnt*3)  << endl;
 	ofs.flush();
-	cout << "ERR4" << endl;
+	//cout << "ERR4" << endl;
 	for (unsigned int i = 0; i < cells.size(); i++) {
-		cout << "ERR4 Cell: " << i << endl;
+		//cout << "ERR4 Cell: " << i << endl;
 		if (cytoplasm) { 
 			ofs << cells.at(i)->get_Node_Count();
 		} else { 
@@ -840,7 +840,7 @@ void Tissue::print_VTK_File(ofstream& ofs, bool cytoplasm) {
 	}
 	
 	//output pairs of node indices to draw adh line
-	cout << "ERR5" << endl;
+	//cout << "ERR5" << endl;
 	for(unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->print_VTK_Adh(ofs);
 	}
