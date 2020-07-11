@@ -1389,8 +1389,30 @@ void Cell::delete_Wall_Node_Check(int Ti){
 			}
 		}
 	} while (repeat);
+	refresh_Walls();
 	return;
 }
+
+void Cell::refresh_Walls() { 
+
+	this->wall_nodes.clear();
+	this->num_wall_nodes = 0;
+	
+	shared_ptr<Wall_Node> curr = this->left_Corner;
+	shared_ptr<Wall_Node> next = NULL;
+	shared_ptr<Wall_Node> orig = curr;
+
+	do {
+		this->wall_nodes.push_back(curr);
+		next = curr->get_Left_Neighbor();
+		num_wall_nodes++;
+		curr = next;
+	} while(next != orig);
+	//cout << "update equi angles" << endl;
+
+	return;
+}
+
 void Cell::add_Wall_Node(int Ti) {
 
 	//find node to the right of largest spring
@@ -1750,21 +1772,37 @@ void Cell::print_VTK_Adh(ofstream& ofs) {
 	shared_ptr<Wall_Node> neighbor = NULL;
 	shared_ptr<Wall_Node> curr_wall = left_Corner;
 	vector<shared_ptr<Wall_Node>> nodes;
-	//int ERR5_CTR = 0;
-	//int ERR6_CTR = 0;
 	do {
-		//cout << "ERR5_CTR: " << ERR5_CTR++;
-		//ERR6_CTR = 0;
 		for(unsigned int i = 0; i < curr_wall->get_adh_vec().size(); i++) {
-			//cout << "ERR6_CTR: " << ERR6_CTR++ << " i= " << i;
-			cout.flush();
 			nodes = curr_wall->get_adh_vec();
-			cout << " AdhVec size=" << nodes.size() << endl;
 			neighbor = nodes.at(i);
 			if (neighbor != NULL) {
 				my_id = curr_wall->get_VTK_Id();
 				nei_id = neighbor->get_VTK_Id();
+				ofs.flush();	
 				ofs << 2 << ' ' << my_id << ' ' << nei_id << endl;
+				if (abs(nei_id) > 500000 || abs(my_id) > 500000) { 
+					cout << "ERR7! Cell: " << rank << ", node stats:" << endl;
+					cout << "Num adhesions: " << curr_wall->get_adh_vec().size() << endl;
+					cout << "Current value of i: " << i << endl;
+					cout << "My address: " << curr_wall << ", VTK ID: " << my_id << endl;
+					cout << "Neighbor address: " << neighbor << ", VTK ID: " << nei_id << endl;
+					cout << "Neighbor belongs to: " << neighbor->get_My_Cell() << " AkA cell rank " << neighbor->get_My_Cell()->get_Rank() << endl;
+				} else if (ofs.bad()) { 
+					cout << "ERR8!  Bad Bit in ofs! " << endl;
+					cout << "Num adhesions: " << curr_wall->get_adh_vec().size() << endl;
+					cout << "Current value of i: " << i << endl;
+					cout << "My address: " << curr_wall << ", VTK ID: " << my_id << endl;
+					cout << "Neighbor address: " << neighbor << ", VTK ID: " << nei_id << endl;
+					cout << "Neighbor belongs to: " << neighbor->get_My_Cell() << " AkA cell rank " << neighbor->get_My_Cell()->get_Rank() << endl;
+				} else if (ofs.fail()) { 
+					cout << "ERR9! Fail bit in ofs! " << endl;
+					cout << "Num adhesions: " << curr_wall->get_adh_vec().size() << endl;
+					cout << "Current value of i: " << i << endl;
+					cout << "My address: " << curr_wall << ", VTK ID: " << my_id << endl;
+					cout << "Neighbor address: " << neighbor << ", VTK ID: " << nei_id << endl;
+					cout << "Neighbor belongs to: " << neighbor->get_My_Cell() << " AkA cell rank " << neighbor->get_My_Cell()->get_Rank() << endl;
+				}
 			}
 		}
 		curr_wall = curr_wall->get_Left_Neighbor();
@@ -1918,25 +1956,19 @@ void Cell::print_VTK_Points(ofstream& ofs, int& count, bool cytoplasm) {
 	shared_ptr<Wall_Node> curr_wall = left_Corner;
 	shared_ptr<Wall_Node> orig = curr_wall;
 	////cout << "knows left corner" << endl;
-	int ERR2CTR_WALL = 0;
 	do {
 		Coord loc = curr_wall->get_Location();
 		ofs << loc.get_X() << ' ' << loc.get_Y() << ' ' << 0 << endl;
 		//cout<< "maybe cant do left neighbor" << endl;
 		curr_wall = curr_wall->get_Left_Neighbor();
 		count++;
-		cout << "ERR2CTR: " << ERR2CTR_WALL << endl;
-		ERR2CTR_WALL++;
 	} while (curr_wall != orig);
-	int ERR3CTR_CYT = 0;
 	if (cytoplasm) { 
 		//cout << "walls worked" << endl;
 		for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 			Coord loc = cyt_nodes.at(i)->get_Location();
 			ofs << loc.get_X() << ' ' << loc.get_Y() << ' ' << 0 << endl;
 			count++;
-			cout << "ERR3CTR: " << ERR3CTR_CYT << endl;
-			ERR3CTR_CYT++;
 		};
 	}
 
@@ -2527,6 +2559,17 @@ return;
 
 
 //Debugging functions
+
+void Cell::one_To_One_Check() { 
+	shared_ptr<Wall_Node> curr_wall; 
+	for (unsigned int i = 0; i < wall_nodes.size(); i++) { 
+		curr_wall = wall_nodes.at(i); 
+		curr_wall->one_to_one_check();
+		curr_wall = curr_wall->get_Right_Neighbor();
+	} 
+	return;
+}
+
 void Cell::NAN_CATCH(int Ti) { 
 
 	vector<shared_ptr<Cyt_Node>> cyts;

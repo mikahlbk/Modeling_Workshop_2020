@@ -169,6 +169,7 @@ class Cell: public enable_shared_from_this<Cell> {
 		double calc_Area();
 		void add_Wall_Node_Check(int Ti);
 		void delete_Wall_Node_Check(int Ti);
+		void refresh_Walls();
 		void add_Wall_Node(int Ti);
 		void delete_Wall_Node(int Ti);
 		void delete_Specific_Wall_Node(int Ti, shared_ptr<Wall_Node> wall);
@@ -242,6 +243,8 @@ class Cell: public enable_shared_from_this<Cell> {
 		//Division 
 		shared_ptr<Cell> division();
 		//Debugging
+		void one_To_One_Check();
+		//void ensure_Only_Real_Walls();
 		void NAN_CATCH(int Ti);
 };
 

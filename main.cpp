@@ -304,6 +304,7 @@ int main(int argc, char* argv[]) {
 			//THIS MUST BE RUN FIRST: Tensile stress is calculated
 			//once for this, and NOT before the next to prevent
 			//double-calculating.
+			growing_Tissue.one_To_One_Check();
 			growing_Tissue.print_VTK_File(ofs_anim,true);
 			ofs_anim.close();	
 

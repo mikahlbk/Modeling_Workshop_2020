@@ -351,7 +351,7 @@ void Wall_Node::make_connection(vector<shared_ptr<Wall_Node>> neighbor_walls) {
 }
 //ensures that if a node has made a connection
 //both nodes apply force to each other
-void Wall_Node::one_to_one_check(){
+void Wall_Node::one_to_one_check() {
 	shared_ptr<Wall_Node> this_ptr = shared_from_this();
 	vector<shared_ptr<Wall_Node>> this_adh_vec;
 	unsigned int duplicate_index;
@@ -359,8 +359,8 @@ void Wall_Node::one_to_one_check(){
 	this_adh_vec = this_ptr->adhesion_vector;
 	vector<shared_ptr<Wall_Node>> connection_adh_vec;
 	unsigned int i = 0;
+	//Get rid of duplicates in my vector.
 	while (i < this_adh_vec.size()) { 
-		//Get rid of duplicates in my vector.
 		duplicate_index = 0;
 		my_instances = 0;
 		for (unsigned int j = i+1; j < this_adh_vec.size(); j++) {
@@ -390,8 +390,44 @@ void Wall_Node::one_to_one_check(){
 		} 
 		i++;
 	}
+	//Get rid of duplicates (of me?) in my partners' vectors
+	
+	i = 0; 
+	//Ensure all adhesion partners belong to a cell.
+	shared_ptr<Cell> cell_of_neighbor;
+	vector<shared_ptr<Wall_Node>> walls_of_neighbor_cell;
+	this_adh_vec = this_ptr->adhesion_vector;
+	bool i_was_fake;
+	while (i < this_adh_vec.size()) { 
+		i_was_fake = false;
+		cell_of_neighbor = this_adh_vec.at(i)->get_My_Cell();
+		cell_of_neighbor->get_Wall_Nodes_Vec(walls_of_neighbor_cell);
+		for (unsigned int j = 0; j <= walls_of_neighbor_cell.size(); j++) { 
+			if (j == walls_of_neighbor_cell.size()) { 
+				//this connection wasn't anywhere in the list of nodes. It's bad.
+				cout << "ERR11: Fake node found in adhesion partners." << endl;
+				i_was_fake = true;
+				this_ptr->erase_Adhesion_Element(i);
+				this_adh_vec = this_ptr->adhesion_vector;
+				break;
+				
+			} else if (this_adh_vec.at(i) == walls_of_neighbor_cell.at(j)) { 
+				//This neighbor does indeed belong to a cell.
+				break;
+			}
+		}
+		if (!i_was_fake) i++;
+	}
+
+	
 	return;
 }
+
+/*void Wall_Node::ensure_Only_Real_Walls() { 
+
+	return;
+}*/
+
 //clears adhesion vector of current node
 void Wall_Node::clear_adhesion_vec(){
 	this->adhesion_vector.clear();	
@@ -418,19 +454,23 @@ void Wall_Node::update_adh_vec(shared_ptr<Wall_Node> node) {
 //cell wall nodes from neighboring cells 
 void Wall_Node::remove_from_adh_vecs() {
 	unsigned int self_index;
+	int no_of_me;
 	shared_ptr<Wall_Node> me = shared_from_this();
 	vector<shared_ptr<Wall_Node>> neighbor_connections;
 	this->one_to_one_check();
 	for (unsigned int i = 0; i < adhesion_vector.size(); i++) {
 		self_index = 100;
+		no_of_me = 0;
 		neighbor_connections.clear();
 		neighbor_connections = adhesion_vector.at(i)->get_adh_vec();
 		for (unsigned int j = 0; j < neighbor_connections.size(); j++) { 
 			if (neighbor_connections.at(j) == me) { 
 				self_index = j;				
+				no_of_me++;
 			}
 		}
 		if (self_index == 100) cout << "I am not here!" << endl;
+		if (no_of_me > 1) cout << "ERR10 - node.cpp (Apparently 1-1 failed...)" << endl;
 		adhesion_vector.at(i)->clear_adhesion_vec();
 		for (unsigned int j = 0; j < neighbor_connections.size(); j++) {
 			if (neighbor_connections.at(j) != me) {

@@ -106,6 +106,7 @@ class Tissue {
 		//Destructor
 		~Tissue();
 		//Debugging
+		void one_To_One_Check();
 		void NAN_CATCH(int Ti);
 		void BAD_CATCH(int call, int Ti);
 };
