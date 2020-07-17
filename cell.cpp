@@ -105,6 +105,8 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 	} else {
 		Cell_Progress = my_tissue->unifRand(0.5,0.75);
 	}
+	//Cell_Progress = my_tissue->unifRand(0.15,0.85);
+	
 	//cout << "CELL PROGRESS CONSTRUCTOR: " << Cell_Progress << endl;
 	//Cell_Progress = my_tissue->unifRandInt(0,10);
 	this->cell_center = center;
