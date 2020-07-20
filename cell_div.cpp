@@ -549,19 +549,13 @@ shared_ptr<Cell> Cell::division() {
 				break;
 			case 4:
 				//Merged Mechanism
-				if (my_tissue->unifRand() < MECH_DIV_PROB) {
-					//Do the mech thing
-					find_nodes_for_div_plane_mechanical(nodes); 
-				} else {
-					//Do the chemical thing
-					if(my_tissue->unifRand() < hill_Prob()) {
-						//hill_Prob is the probability of periclinal.
-						orientation = Coord(1,0); //periclinal division
-					} else {
-						//Else anticlinal.
-						orientation = Coord(0,1);
-					}
+				if(my_tissue->unifRand() < hill_Prob()) {
+					//hill_Prob is the probability of periclinal.
+					orientation = Coord(1,0); //periclinal division
 					find_nodes_for_div_plane(orientation,nodes,11);
+				} else {
+					//Else mechanical.
+					find_nodes_for_div_plane_mechanical(nodes); 
 				}
 				break;
 			default:
