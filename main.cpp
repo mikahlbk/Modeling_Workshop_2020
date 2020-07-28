@@ -186,12 +186,14 @@ int main(int argc, char* argv[]) {
 
 	int Ti = 0;
 	int terminal_timer = 0;
-	bool is_terminal = false;
-
+	//bool is_terminal = false;
+	//For hard-set time limit
+	bool is_terminal = true;
+	int terminal_timeout = 362500; //Plant stops 40.28 hours (exactly 145 vtks) after simulation begins
 
 	//Delta t is approximately 0.4s
 	//int terminal_timeout = 182000; //Plant stops at 20.2 hours after all cells divide
-	int terminal_timeout = 12500; // Plant stops at 1.5 hours after all cells divide
+	//int terminal_timeout = 12500; // Plant stops at 1.5 hours after all cells divide
 	while (terminal_timer < terminal_timeout) {
 		//keep track of simulation runs
 		if (!is_terminal) {
