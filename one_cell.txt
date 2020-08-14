@@ -1,7 +1,7 @@
-CellRank:5
-Center:8,0
+CellRank:0
+Center:0,0
 Radius:3.75
-Layer:1
+Layer:3
 Boundary:0
 Stem:0
 End_Cell

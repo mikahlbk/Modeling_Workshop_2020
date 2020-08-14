@@ -56,6 +56,8 @@ int main(int argc, char* argv[]) {
 			flag_names.push_back(argv[i+1]);
 		} else if (!strcmp(argv[i], "-bigdata")) { 
 			bigdata = true;
+		} else if (!strcmp(argv[i], "-onecell")) { 
+			bigdata_path = "/bigdata/wchenlab/shared/one_cell/";
 		}
 	}
 

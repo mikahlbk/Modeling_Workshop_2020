@@ -252,6 +252,7 @@ Coord Tissue::Compute_L1_AVG() {
 	return top_cell_center;
 }*/
 Coord Tissue::Compute_L1_AVG() {
+	return Coord(0,0);
 	Coord avg;
 	vector<pair<double,unsigned int>> dist_coord_pairs;
 	double avgx = 0;
@@ -363,7 +364,8 @@ double Tissue::get_normal_number(double mean, double sigma) {
 }
 void Tissue::update_Signal(bool initial_update){
 	
-	Coord L1_AVG = this->Compute_L1_AVG();
+	//Coord L1_AVG = this->Compute_L1_AVG();
+	Coord L1_AVG = Coord(0,0);
 	update_Avg_Cell_Diameter();
 	for(int i = 0; i < num_cells; i++){
 		//cout<< "WUS" << endl;
@@ -381,6 +383,8 @@ void Tissue::update_Signal(bool initial_update){
 }
 
 void Tissue::update_Avg_Cell_Diameter() { 
+	this->avg_cell_diam = 7;
+	return;
 	double acd = 0;
 	int count = 0;
 	shared_ptr<Cell> temp;

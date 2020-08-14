@@ -49,7 +49,7 @@ void Cell::find_nodes_for_div_plane(Coord& orientation, vector<shared_ptr<Wall_N
 	double curr_distance=0;
 	shared_ptr<Wall_Node> first_node;
 	shared_ptr<Wall_Node> second_node;
-	for(unsigned int i = 0; i< walls.size(); i++) {
+	for(unsigned int i = 0; i < walls.size(); i++) {
 
 		q_to_curr_wall = Coord(walls.at(i)->get_Location().get_X() - q.get_X(), walls.at(i)->get_Location().get_Y()-q.get_Y());
 		q_to_r_cross_q_to_curr_wall = q_to_r.cross(q_to_curr_wall);
@@ -145,7 +145,7 @@ void Cell::Errera_div(vector<shared_ptr<Wall_Node>>& nodes){
 	shared_ptr<Wall_Node> area_next;
 	int counter1;
 	int counter2;
-	for(unsigned int i = 0; i< walls.size(); i++){
+	for(unsigned int i = 0; i < walls.size(); i++){
 		curr = walls.at(i);
 		counter1 = 0;
 		counter2 = 0;
@@ -464,6 +464,7 @@ shared_ptr<Cell> Cell::division() {
 	//	this function will create a sister cell
 	//	and return it to the tissue
 	//cout << "New Cell" << endl;
+	cout << "DIV 1" << endl;
 	shared_ptr<Wall_Node> curr_wall = left_Corner;
 	/*cout << "Mother angles before: " << endl;
 	  do { 
@@ -479,7 +480,8 @@ shared_ptr<Cell> Cell::division() {
 	this->set_MD(1);
 
 	this->life_length = 0;	
-	this->Cell_Progress = 0;		
+	this->Cell_Progress = 0;
+	cout << "DIV 2" << endl;
 	sister->reset_Cell_Progress();
 	sister->reset_Life_Length();
 	//this is the vector for the desired division orientation
@@ -500,26 +502,32 @@ shared_ptr<Cell> Cell::division() {
 
 	//orientation by chemical concentration
 	vector<shared_ptr<Wall_Node>> nodes;
+	cout << "DIV 3" << endl;
 	//cout << "Nodes before " << nodes.size() << endl;
 
 	bool forced_anticlinal = ((this->layer == 1)||(this->layer==2))
 		&& L1_L2_FORCED_ANTICLINAL_DIV;
 
 	vector<shared_ptr<Cell>> cells;
+	cout << "DIV 4" << endl;
 	my_tissue->get_Cells(cells);
-	Coord tissue_base_location = cells.at(TISSUE_BASE)->get_Cell_Center();
+	//Coord tissue_base_location = cells.at(TISSUE_BASE)->get_Cell_Center();
+	
+
+	cout << "DIV 5" << endl;
 
 	if (forced_anticlinal) { 
+		cout << "DIV 6" << endl;
 
 		//orientation = Coord(0,1);
-		Coord pre_orientation = this->get_Cell_Center() - tissue_base_location;
-		orientation = pre_orientation / pre_orientation.length();
+		//Coord pre_orientation = this->get_Cell_Center() - tissue_base_location;
+		//orientation = pre_orientation / pre_orientation.length();
 
-		find_nodes_for_div_plane(orientation,nodes,11);
+		//find_nodes_for_div_plane(orientation,nodes,11);
 
 
 	} else { 
-		switch (DIV_MECHANISM) { 
+		switch (DIV_MECHANISM) {
 			case 1: 
 				//Errera's rule
 				Errera_div(nodes);
@@ -544,6 +552,7 @@ shared_ptr<Cell> Cell::division() {
 				find_nodes_for_div_plane(orientation,nodes,11);
 				break;
 			case 3:
+				cout << "DIV 7" << endl;
 				//Mechanical Division
 				find_nodes_for_div_plane_mechanical(nodes); 
 				break;
@@ -559,11 +568,12 @@ shared_ptr<Cell> Cell::division() {
 				}
 				break;
 			default:
-				//cout << "DIV_MECH NOT ENTERED. Exiting..." << endl;
+				cout << "DIV_MECH NOT ENTERED. Exiting..." << endl;
 				exit(1);
 		}
 	}
 
+	cout << "DIV 8" << endl;
 	my_tissue->update_Divplane_Vector(nodes.at(0)->get_Location() - nodes.at(1)->get_Location(), 
 			this->layer);
 	//cout << "Nodes after " << nodes.size() << endl;
@@ -574,6 +584,7 @@ shared_ptr<Cell> Cell::division() {
 	shared_ptr<Wall_Node> second = nodes.at(1);
 	//shared_ptr<Wall_Node> first = first_node;
 	//shared_ptr<Wall_Node> second = second_node;
+	cout << "DIV 9" << endl;
 	vector<shared_ptr<Wall_Node>> daughter_ends;
 	move_start_end_points(first, second, daughter_ends);
 	//move start end points returns daughter_ends as
@@ -592,6 +603,7 @@ shared_ptr<Cell> Cell::division() {
 	//cout << "d two lenght" << daughter_two_length << endl;
 
 	//this is how many new nodes will be made for each cell
+	cout << "DIV 10" << endl;
 	int total_num_one = static_cast<int>(daughter_one_length/(Membr_Equi_Len_Short*3));
 	int total_num_two = static_cast<int>(daughter_two_length/(Membr_Equi_Len_Short*3));
 	//cout << "Total num one" << total_num_one << endl;
@@ -607,6 +619,7 @@ shared_ptr<Cell> Cell::division() {
 	//this is how much x should increment by when
 	//making new cell wall nodes for 
 	//each cell
+	cout << "DIV 11" << endl;
 	double delta_x_one = (double)x_one/(double)total_num_one;
 	double delta_x_two = (double)x_two/(double)total_num_two;
 
@@ -618,6 +631,7 @@ shared_ptr<Cell> Cell::division() {
 	double delta_y_two = (double)y_two/(double)total_num_two;
 
 	//some variables to be used for making new nodes
+	cout << "DIV 12" << endl;
 	shared_ptr<Wall_Node> currW = start_daughter_one;
 	Coord location = start_daughter_one->get_Location();
 	shared_ptr<Wall_Node> prevW = start_daughter_one;
@@ -630,6 +644,7 @@ shared_ptr<Cell> Cell::division() {
 
 	//cout << "Make daughter one new cell wall nodes" << endl;
 	double total_num_one_minus_four = total_num_one -4;
+	cout << "DIV 13" << endl;
 	for(unsigned int i = 0; i < total_num_one_minus_four; i++){
 		curr_X = 
 			curr_X + delta_x_one;
@@ -654,6 +669,7 @@ shared_ptr<Cell> Cell::division() {
 	counter = 0;
 	currW = start_daughter_two;
 	location = start_daughter_two->get_Location();
+	cout << "DIV 14" << endl;
 	prevW = start_daughter_two;
 	curr_X = location.get_X()+2*delta_x_two;
 	curr_Y = location.get_Y()+2*delta_y_two;
@@ -676,6 +692,7 @@ shared_ptr<Cell> Cell::division() {
 		//cout<< counter << endl;
 
 	}
+	cout << "DIV 15" << endl;
 	currW->set_Right_Neighbor(end_daughter_two);
 	end_daughter_two->set_Left_Neighbor(currW);
 	sister->set_Left_Corner(start_daughter_two);
@@ -685,6 +702,8 @@ shared_ptr<Cell> Cell::division() {
 	//the wall node vectors for each cell 
 	//and setting private member variables for 
 	//each new wall node
+	
+	cout << "DIV 16" << endl;
 	double new_damping = this->get_Damping();	
 	sister->set_Damping(new_damping);
 	shared_ptr<Wall_Node> curr = sister->get_Left_Corner();
@@ -694,6 +713,7 @@ shared_ptr<Cell> Cell::division() {
 	double k_bend = 0;
 	int number_nodes_B = 0;
 	//cout << "Cell two counting" << endl;
+	cout << "DIV 17" << endl;
 	do {
 		number_nodes_B++;
 		curr->update_Cell(sister);
@@ -723,6 +743,7 @@ shared_ptr<Cell> Cell::division() {
 	//cout << "Sister: " << number_nodes_B << endl;
 
 	this->wall_nodes.clear();
+	cout << "DIV 18" << endl;
 
 	curr = this->left_Corner;
 	orig = this->left_Corner;
@@ -755,6 +776,7 @@ shared_ptr<Cell> Cell::division() {
 			exit(1);
 		}
 	} while(curr != orig);
+	cout << "DIV 19" << endl;
 	//cout << "Done counting cell one" << endl;	
 	this->set_Wall_Count(number_nodes_A);
 	//cout << "Parent nodes: " << number_nodes_A << endl;	
@@ -766,8 +788,10 @@ shared_ptr<Cell> Cell::division() {
 	sister->update_Wall_Angles();
 	this->update_Cell_Center();
 	sister->update_Cell_Center();
+	cout << "DIV 20" << endl;
 	Coord L1_AVG = this->get_Tissue()->Compute_L1_AVG();
 	double acd = this->get_Tissue()->get_Avg_Cell_Diameter();
+	cout << "DIV 21" << endl;
 	this->calc_WUS(L1_AVG, 2 * acd);
 	sister->calc_WUS(L1_AVG, 2 * acd);
 	this->calc_CK(L1_AVG, 3 * acd);
@@ -884,13 +908,16 @@ shared_ptr<Cell> Cell::division() {
 		set_Growing_This_Cycle(true);
 	}
 
+	this->one_To_One_Check();
+	sister->one_To_One_Check();
+
 	return sister;
 }
 void Cell::move_cyt_nodes(Coord center_point){
 	Coord vector_from_center;
 	//double length_from_center_pt;
 	Coord location;
-	for(unsigned int i=0; i<cyt_nodes.size(); i++){
+	for(unsigned int i = 0; i < cyt_nodes.size(); i++){
 		//length_from_center_pt = (cyt_nodes.at(i)->get_Location()-center_point).length();
 		vector_from_center = cyt_nodes.at(i)->get_Location() - this->cell_center;
 

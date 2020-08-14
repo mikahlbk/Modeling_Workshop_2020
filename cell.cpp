@@ -105,7 +105,8 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 	} else {
 		Cell_Progress = my_tissue->unifRand(0.5,0.75);
 	}*/
-	Cell_Progress = my_tissue->unifRand(0.15,0.85);
+	//Cell_Progress = my_tissue->unifRand(0.15,0.85);
+	Cell_Progress = 0;
 	
 	//cout << "CELL PROGRESS CONSTRUCTOR: " << Cell_Progress << endl;
 	//Cell_Progress = my_tissue->unifRandInt(0,10);
@@ -344,7 +345,9 @@ void Cell::update_Cell_Progress() {
 	return;
 }*/
 void Cell::calc_WUS(Coord L1_AVG, double WUS_dropdown) {
-	
+	this->wuschel = 65;
+	return;
+
 	//new data from eric
 	//CZ ~5 cells wide
 	//layer 1
@@ -433,7 +436,7 @@ void Cell::set_growth_rate(bool first_growth_rate) {
 
 	//this->growth_rate = my_tissue->unifRandInt(5000,30000);
 	//mt19937 gen = this->get_Tissue()->get_random_generator();
-	if(this->wuschel < 55) {
+/*	if(this->wuschel < 55) {
 		//WUS less than 55
 		mean = 10800; // 18 hr
 		sigma = 1800/2; // 1.5 hr
@@ -457,7 +460,9 @@ void Cell::set_growth_rate(bool first_growth_rate) {
 		mean = 39600; //66 hr
 		sigma = 16200/2; //13.5 hr
 		this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
-	}
+	}*/
+
+	this->growth_rate = 14400;
 
 	//else if((this->wuschel >=78) && (this->wuschel <81.8)){
 	//	this->growth_rate = my_tissue->unifRandInt(30024,35526);
@@ -557,6 +562,12 @@ void Cell::update_growth_direction(){
 	//signaling stuff
 	//Isotropic growth if you're not growing this cycle or if
 	//you're in the boundary
+	//
+	//
+	
+
+	this->growth_direction = Coord(1,0);
+	return;
 	
 	if (CHEMICAL_GD) { 
 		if (HILL_PROB) { 

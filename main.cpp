@@ -32,9 +32,9 @@ using namespace std;
 bool OUT_OF_PLANE_GROWTH = true; //./batchGenerator -flag OOP_off
 bool WUS_LEVEL = false;
 //EXPERIMENTAL PARAMTERS
-double OOP_PROBABILITY = 0.3; //Defaults to 0.3
+double OOP_PROBABILITY = 0.0; //Defaults to 0.3
 double MECH_DIV_PROB = 0.5;
-int DIV_MECHANISM = 1; //./batchGenerator -par -div <int>
+int DIV_MECHANISM = 3; //./batchGenerator -par -div <int>
 //1 - Errera, 2 - Chem, 3 - Mech, 4 - Merged
 double WUS_RAD_CONTRACTION_FACTOR = 1;//./batchGenerator -par -WR <double>
 double CK_RAD_CONTRACTION_FACTOR = 1; //./batchGenerator -par -CKR <double>
@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) {
 	//.txt file that tells initial
 	//cell configuration 
 	//cout << "before cell file is read in" << endl;
-	string init_tissue = "staggered_generated.txt";
+	string init_tissue = "one_cell.txt";
 	//string init_tissue = "one_cell.txt";
 	//cout << "Read in cell starter" << endl;	
 
@@ -128,12 +128,15 @@ int main(int argc, char* argv[]) {
 	//instantiate tissue
 	//new cell and node objects
 	//are made in this call
+	cout << "Gonna start making the tissue..." << endl;
 	Tissue growing_Tissue(init_tissue,gen);
+	cout << "Tissue made." << endl;
 	//Tissue growing_Tissue_experiment(init_tissue);
 	//growing_Tissue.assign_dist_vecs(dist1, dist2, dist3, dist4);
 	//cout << "Finished creating Cells" << endl;
 	growing_Tissue.update_Signal(true);
 	growing_Tissue.update_growth_direction();
+	cout << "Signal done." << endl;
 	//cout << "Signal" << endl;
 	//growing_Tissue.update_growth_direction();
 	//cout << "growth direction" << endl;
