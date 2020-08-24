@@ -783,7 +783,7 @@ shared_ptr<Cell> Cell::division() {
 
 	//update cell level variables
 	this->update_Wall_Equi_Angles();
-	sister->update_Wall_Equi_Angles();;
+	sister->update_Wall_Equi_Angles();
 	this->update_Wall_Angles();
 	sister->update_Wall_Angles();
 	this->update_Cell_Center();

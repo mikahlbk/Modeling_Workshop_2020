@@ -113,7 +113,7 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer, int b
 	this->cell_center = center;
 	//this gets reupdated after singal is assigned
 	//in tissue constructor
-	growth_direction = Coord(0,0);
+	growth_direction = Coord(1,0);
 	//This is a placeholder.  This is updated in main after signal calculation.
 	recent_div = false;
 	recent_div_MD = 0;
@@ -462,7 +462,7 @@ void Cell::set_growth_rate(bool first_growth_rate) {
 		this->growth_rate = getRandomDoubleUsingNormalDistribution(mean,sigma);
 	}*/
 
-	this->growth_rate = 14400;
+	this->growth_rate = 19800;
 
 	//else if((this->wuschel >=78) && (this->wuschel <81.8)){
 	//	this->growth_rate = my_tissue->unifRandInt(30024,35526);
@@ -562,12 +562,6 @@ void Cell::update_growth_direction(){
 	//signaling stuff
 	//Isotropic growth if you're not growing this cycle or if
 	//you're in the boundary
-	//
-	//
-	
-
-	this->growth_direction = Coord(1,0);
-	return;
 	
 	if (CHEMICAL_GD) { 
 		if (HILL_PROB) { 
@@ -614,6 +608,7 @@ void Cell::update_growth_direction(){
 			}
 		}
 	}
+	this->growth_direction = Coord(1,0);
 	this->update_node_parameters_for_growth_direction();
 	return;
 }
@@ -714,6 +709,24 @@ double Cell::compute_k_lin(shared_ptr<Wall_Node> current) {
 
 	return k_lin;
 }
+double Cell::compute_Aspect_Ratio(){
+	vector<shared_ptr<Wall_Node>> short_axis_nodes;
+	vector<shared_ptr<Wall_Node>> long_axis_nodes;
+	Errera_div(short_axis_nodes);
+	Coord v_1 = short_axis_nodes.at(0)->get_Location();
+	Coord v_2 = short_axis_nodes.at(1)->get_Location();
+	Coord short_direction = (v_2-v_1)/((v_2-v_1).length());
+	//Note that this is ALWAYS taken to be with theta between 0 and 180 degrees.
+	Coord long_direction = short_direction.perpVector();
+	find_nodes_for_div_plane(long_direction, long_axis_nodes, 11); 
+	Coord v_3 = long_axis_nodes.at(0)->get_Location();
+	Coord v_4 = long_axis_nodes.at(1)->get_Location();
+	double long_length = (v_4 - v_3).length();
+	double short_length = (v_2 - v_1).length();
+	double aspect_ratio = long_length / short_length;
+	return aspect_ratio;
+}
+
 double Cell::compute_k_bend(shared_ptr<Wall_Node> current) {
 	//coefficient of bending spring is very important
 	//nodes that are parrallel to growth direction have 
@@ -820,7 +833,7 @@ void Cell::update_Wall_Equi_Angles() {
 		Coord curr_vec;	
 		int counter = 0;
 		double new_equi_angle = 0; 
-		double circle_angle  = (this->num_wall_nodes-2)*pi/(this->num_wall_nodes);
+		double circle_angle  = (this->num_wall_nodes -2)*pi/(this->num_wall_nodes);
 #pragma omp parallel for schedule(static,1)
 		for(unsigned int i = 0; i < walls.size();i++) {	
 			if(this->growth_direction != Coord(0,0)){
@@ -830,9 +843,9 @@ void Cell::update_Wall_Equi_Angles() {
 				costheta = growth_direction.dot(curr_vec)/(curr_len*growth_len);
 				theta = acos( min( max(costheta,-1.0), 1.0) );
 				if((theta < ANGLE_FIRST_QUAD) || (theta > ANGLE_SECOND_QUAD)){
+					counter++;
 					new_equi_angle = pi;
 				} else {
-					counter++;
 					new_equi_angle = circle_angle;
 
 				}
@@ -840,16 +853,7 @@ void Cell::update_Wall_Equi_Angles() {
 				//cout << "elseeeeee" << endl;
 				new_equi_angle = circle_angle;
 			}
-			//if((layer == 1)||(layer == 2)){
-			//	new_equi_angle = circle_angle;
-			//}
-
-
-			//this was an idea to make the round part of the cell
-			//smaller in radius but not necessary
-			//if(new_equi_angle != pi) {
-			//	new_equi_angle =  (counter*2-2)*pi/(counter*2);
-			//}
+	
 
 			walls.at(i)->update_Equi_Angle(new_equi_angle);
 		}
@@ -1577,7 +1581,6 @@ void Cell::delete_Specific_Wall_Node(int Ti, shared_ptr<Wall_Node> wall) {
 			curr = next;
 		} while(next != orig);
 		//cout << "update equi angles" << endl;
-
 		update_Wall_Equi_Angles();
 
 		//cout << "update angles" << endl;

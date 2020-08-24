@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
 	char WUS_CF[100]= "";
 	char CK_CF[100] = "";
 	char WUS_LEVEL[100] = "";
-	string bigdata_path = "/bigdata/wchenlab/shared/Rand_Init_Sims/";
+	string bigdata_path = "/bigdata/wchenlab/shared/Workshop/";
 	string final_path;
 	int divDataCutoff;
 	bool bigdata = false;

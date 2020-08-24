@@ -44,6 +44,7 @@ int VTK_PER_DATA_POINT = 5;
 int RECENT_DIV_NUM_FRAMES = 10;
 bool CHEMICAL_GD = true; //./batchGenerator -par -Chem_GD <1 or 0>
 int Weird_WUS = 0;
+double K_BEND_STIFF = 15;
 //Must be declared in externs.h
 //For clarity, listed as comments in phys.h
 
@@ -88,6 +89,8 @@ int main(int argc, char* argv[]) {
 			Weird_WUS = stoi(argv[i+1]);
 		}else if(!strcmp(argv[i], "-WUS_change")) {
 			WUS_LEVEL = stoi(argv[i+1]) ? true : false;
+		}else if(!strcmp(argv[i], "-Bending")){
+			K_BEND_STIFF = stoi(argv[i+1]);
 		}
 	}
 	if (DIV_MECHANISM == 0) { 
@@ -225,20 +228,20 @@ int main(int argc, char* argv[]) {
 		
 		
 		if(Ti == 10000) {
-			growing_Tissue.update_Signal(false);
-			growing_Tissue.update_growth_direction();
+			//growing_Tissue.update_Signal(false);
+			//growing_Tissue.update_growth_direction();
 		}
 		if(Ti % 30000 == 0) {
 			//cout << "update signal" << endl;
-			growing_Tissue.update_Signal(false);
-			growing_Tissue.update_growth_direction();
+			//growing_Tissue.update_Signal(false);
+			//growing_Tissue.update_growth_direction();
 		}
 		//adds one new cell wall node per cell everytime it is called
 		//dont call it right away to give cell time to find initial configuration
 		if(Ti >= 10000){
 			if(Ti%1000 == 0){	
 				//cout << "add new cell wall nodes if needed" << endl;
-				growing_Tissue.add_Wall(Ti);
+				//growing_Tissue.add_Wall(Ti);
 			}
 		}
 		//was used previously to help stability of cells
@@ -247,7 +250,8 @@ int main(int argc, char* argv[]) {
 			//if(Ti%1000 == 500){}
 			if (Ti % 1000 == 500) { 
 				//cout << "delete wall" << endl;
-				growing_Tissue.delete_Wall(Ti);
+				//growing_Tissue.delete_Wall(Ti);
+				//growing_Tissue.update_Linear_Bending_Springs();
 				//growing_Tissue.delete_Wall_Node_Check(Ti);
 			}
 		}

@@ -271,8 +271,8 @@ void Wall_Node::set_K_BEND(double k_bend) {
 	this->K_BEND = k_bend;
 	return;
 }
-void Wall_Node::update_Equi_Angle(double new_theta) {
-	this->equi_angle = new_theta;
+	void Wall_Node::update_Equi_Angle(double new_theta) {
+		this->equi_angle = new_theta;
 	return;
 }
 void Wall_Node::set_added(int update){

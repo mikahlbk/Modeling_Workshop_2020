@@ -19,4 +19,5 @@ extern int NUM_STEPS_PER_FRAME;
 extern int RECENT_DIV_NUM_FRAMES;
 extern int VTK_PER_DATA_POINT;
 extern int Weird_WUS;
+extern double K_BEND_STIFF;
 #endif

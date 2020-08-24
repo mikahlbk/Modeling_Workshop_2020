@@ -143,6 +143,7 @@ class Cell: public enable_shared_from_this<Cell> {
 		double compute_k_lin(shared_ptr<Wall_Node> current);
 		double compute_k_bend(shared_ptr<Wall_Node> current);
 		double compute_k_bend_div(shared_ptr<Wall_Node> current);
+		double compute_Aspect_Ratio();
 		void update_Wall_Angles();
 		void update_Wall_Equi_Angles();
 		void update_Wall_Equi_Angles_Div();
